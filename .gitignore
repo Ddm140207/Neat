@@ -1,0 +1,19 @@
+node_modules/
+
+# Environment variables
+.env
+backend/.env
+
+# Local SQLite databases
+*.sqlite
+*.sqlite3
+backend/database/*.sqlite
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS/editor files
+.DS_Store
+.vscode/
+.idea/
