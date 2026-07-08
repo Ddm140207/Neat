@@ -21,6 +21,14 @@ function removeToken() {
   localStorage.removeItem("noty_user");
 }
 
+function getUser() {
+  try {
+    return JSON.parse(localStorage.getItem("noty_user"));
+  } catch {
+    return null;
+  }
+}
+
 function saveUser(user) {
   localStorage.setItem("noty_user", JSON.stringify(user));
 }

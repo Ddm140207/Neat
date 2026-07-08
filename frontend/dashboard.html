@@ -1,280 +1,957 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="light" lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Noty</title>
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Neat! - Gestión de Notas</title>
+<meta content="Neat! - Organiza tu vida con claridad" name="description"/>
+<meta content="Neat!" property="og:title"/>
+<meta content="Organiza tu vida con claridad. Gestor de notas minimalista con diseño glassmórfico." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="/public/banner.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="#005ab6" name="theme-color"/>
+<link href="/public/logo.svg" rel="shortcut icon" type="image/svg+xml"/>
+<link href="/public/logo.svg" rel="icon" type="image/svg+xml"/>
+<link href="/public/logo.png" rel="apple-touch-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"vivid-teal":"#20B2AA","surface-tint":"#005cbb","error-container":"#ffdad6","tertiary-fixed":"#ffd9e3","on-primary-fixed":"#001b3f","on-error-container":"#93000a","secondary":"#6700bf","text-muted":"#64748B","primary-fixed":"#d7e3ff","surface-container-lowest":"#ffffff","on-secondary-container":"#e9d4ff","on-secondary-fixed-variant":"#6400ba","primary":"#005ab6","surface-container-highest":"#e0e3e5","on-secondary":"#ffffff","glass-surface":"rgba(255,255,255,0.15)","secondary-fixed":"#eedbff","secondary-container":"#8700f7","on-error":"#ffffff","outline":"#717786","outline-variant":"#c1c6d7","on-tertiary-fixed":"#3e001f","inverse-on-surface":"#eff1f3","primary-fixed-dim":"#abc7ff","surface-bright":"#f7f9fb","on-primary-fixed-variant":"#00458f","surface-container-low":"#f2f4f6","tertiary-fixed-dim":"#ffb0ca","surface-container-high":"#e6e8ea","surface-dim":"#d8dadc","on-secondary-fixed":"#2a0054","on-primary":"#ffffff","on-primary-container":"#fefcff","surface":"#f7f9fb","error":"#ba1a1a","secondary-fixed-dim":"#d9b9ff","text-main":"#1E293B","on-surface":"#191c1e","inverse-surface":"#2d3133","inverse-primary":"#abc7ff","background":"#f7f9fb","on-background":"#191c1e","on-tertiary":"#ffffff","tertiary-container":"#e10080","surface-container":"#eceef0","glass-border":"rgba(255,255,255,0.25)","on-tertiary-fixed-variant":"#8d004e","surface-variant":"#e0e3e5","on-tertiary-container":"#fffbff","primary-container":"#0072e4","on-surface-variant":"#414754","tertiary":"#b40065"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem","2xl":"1rem","3xl":"1.5rem",full:"9999px"},fontFamily:{sans:["Inter","system-ui","sans-serif"],mono:["JetBrains Mono","monospace"]},fontSize:{"hero-lg":["64px",{lineHeight:"1.1",letterSpacing:"-0.02em",fontWeight:"700"}],"headline-lg":["36px",{lineHeight:"1.2",letterSpacing:"-0.01em",fontWeight:"700"}],"headline-md":["24px",{lineHeight:"1.3",fontWeight:"600"}],"body-lg":["18px",{lineHeight:"1.6"}],"body-md":["16px",{lineHeight:"1.6"}],"label-caps":["12px",{lineHeight:"1.2",letterSpacing:"0.05em",fontWeight:"600"}]}}}}
+</script>
+<style>
+body{background:radial-gradient(circle at top left,#f7f9fb,#e9edef);min-height:100vh}
+.glass-card{background:rgba(255,255,255,0.4);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2)}
+.glass-sidebar{background:rgba(255,255,255,0.15);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,0.2)}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+.custom-checkbox:checked{background-color:#005ab6;background-image:url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e")}
+.glow-orb{position:fixed;width:500px;height:500px;background:rgba(0,90,182,0.05);filter:blur(120px);border-radius:50%;pointer-events:none;z-index:-1;transition:transform 1s ease-in-out}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:100;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);width:90%;max-width:740px;max-height:85vh;z-index:101;opacity:0;pointer-events:none;transition:all 0.25s;overflow:hidden;display:flex;flex-direction:column;background:rgba(255,255,255,0.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(0,0,0,0.06);border-radius:20px;box-shadow:0 12px 40px rgba(15,23,42,0.08)}
+.modal-panel.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.toolbar-container{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 4px 20px rgba(15,23,42,0.06)}
+.toolbar-divider{width:1px;height:24px;margin:0;background:rgba(0,0,0,0.08)}
+#headingDropdown.active{opacity:1;pointer-events:auto;transform:scale(1)}
+.heading-option.active{background:rgba(0,90,182,0.08);color:#005ab6;font-weight:600}
+.toolbar-btn.active{background:rgba(37,99,235,0.12);color:#2563EB}
+.note-editor:focus{outline:none}
+.note-editor h1{font-size:1.75rem;font-weight:700;margin:0.5rem 0}
+.note-editor h2{font-size:1.4rem;font-weight:600;margin:0.4rem 0}
+.note-editor h3{font-size:1.15rem;font-weight:600;margin:0.3rem 0}
+.note-editor ul,.note-editor ol{padding-left:1.5rem;margin:0.3rem 0}
+.spell-error{background:rgba(239,68,68,0.15);border-bottom:2px solid #ef4444;cursor:help}
+.hidden{display:none!important}
+.color-btn-wrap{position:relative}
+.color-dropdown{position:absolute;top:calc(100% + 8px);right:50%;transform:translateX(50%);z-index:200;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 12px 40px rgba(15,23,42,0.12);padding:10px;width:240px}
+.color-dropdown-inner{display:flex;flex-direction:column;gap:8px}
+.color-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.color-swatch{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid transparent;cursor:pointer;transition:transform 120ms,box-shadow 120ms;padding:0}
+.color-swatch:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.color-swatch.selected{border-color:#2563EB;box-shadow:0 0 0 2px #fff,0 0 0 4px #2563EB;transform:scale(1)}
+.color-swatch[data-color="#ffffff"]{border-color:#d1d5db}
+.color-custom-section{border-top:1px solid rgba(0,0,0,0.06);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.color-custom-title{font-size:11px;font-weight:600;color:#64748b;letter-spacing:0.05em}
+.color-custom-row{display:flex;align-items:center;gap:6px}
+.color-custom-row .color-swatch{width:28px;height:28px}
+.color-add-btn,.color-eyedropper-btn{width:28px;height:28px;border-radius:50%;border:1px dashed #d1d5db;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#64748b;transition:all 120ms}
+.color-add-btn:hover,.color-eyedropper-btn:hover{background:rgba(15,23,42,0.05);color:#1e293b}
+.view-section{display:none}
+.view-section.active{display:block}
+.modal-panel-sm{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);z-index:102;background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 25px 60px rgba(15,23,42,0.15);width:90%;max-width:380px;opacity:0;pointer-events:none;transition:all 0.2s}
+.modal-panel-sm.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.note-menu.active{opacity:1;pointer-events:auto;transform:scale(1)}
+#notifPanel{position:fixed;top:70px;right:24px;left:auto!important;transform:translateY(-8px)!important;opacity:0;pointer-events:none;transition:all 0.2s;z-index:103;max-width:380px;width:90%}
+#notifPanel.active{opacity:1;pointer-events:auto;transform:translateY(0)!important}
+.avatar-upload{position:relative;cursor:pointer}
+.avatar-upload img{transition:all 0.3s}
+.avatar-upload:hover img{filter:brightness(0.8)}
+#calHeader th{padding:12px 4px 6px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em}
+#calBody td{padding:6px;text-align:center;cursor:pointer;border-radius:14px;transition:all 150ms;vertical-align:middle;height:52px;font-size:14px;font-weight:500;position:relative;width:14.28%}
+#calBody td:hover{background:rgba(0,90,182,0.06);transform:scale(1.05)}
+#calBody td.today{background:linear-gradient(135deg,#2563EB,#005ab6);font-weight:700;color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25)}
+#calBody td.today .day-num{color:#fff;font-weight:700}
+#calBody td.selected{background:rgba(0,90,182,0.12);font-weight:700;color:#005ab6;box-shadow:0 0 0 2px rgba(0,90,182,0.2)}
+#calBody td.has-notes{font-weight:600}
+#calBody td.has-notes .day-dot{width:6px;height:6px;background:#2563EB;border-radius:50%;margin:3px auto 0;box-shadow:0 1px 3px rgba(37,99,235,0.3)}
+#calBody td.other-month{color:#d1d9e6;font-weight:400}
+#calBody td.other-month .day-num{font-weight:400}
+#calBody td .day-num{font-size:15px;font-weight:500;display:block;line-height:1.2}
+</style>
 </head>
-<body class="dashboard-page">
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div>
-          <p class="eyebrow">Notas</p>
-          <h1>Noty</h1>
-        </div>
-        <button id="logoutButton" class="icon-button" type="button" title="Cerrar sesion">Salir</button>
-      </div>
+<body class="font-sans text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<div class="glow-orb" id="glow-orb"></div>
 
-      <button id="newNoteButton" class="button primary full-width" type="button">Nueva nota</button>
-      <div id="notesList" class="notes-list" aria-label="Lista de notas"></div>
-    </aside>
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col glass-sidebar z-50">
+<div class="p-8 flex items-center gap-3">
+<img src="/public/logo.png" alt="Neat!" class="w-12 h-12 rounded-xl shadow-lg"/>
+<div>
+<h1 class="text-headline-lg font-bold text-black tracking-tight leading-none">Neat!</h1>
+<p class="text-label-caps text-on-surface-variant/60 mt-1" id="sidebarUserName"></p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-glass-surface/50 rounded-xl transition-all duration-200 cursor-default">
+<span class="material-symbols-outlined">inbox</span>
+<span class="text-body-md">Bandeja de entrada</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary border-l-4 border-primary bg-primary/10 rounded-xl transition-all duration-200 translate-x-1 cursor-default">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL'1">today</span>
+<span class="text-body-md font-bold">Notas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-glass-surface/50 rounded-xl transition-all duration-200 cursor-default">
+<span class="material-symbols-outlined">event_upcoming</span>
+<span class="text-body-md">Próximo</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-glass-surface/50 rounded-xl transition-all duration-200 cursor-default">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-body-md">Proyectos</span>
+</a>
+</nav>
+<div class="px-6 pt-4 pb-2">
+<button id="newProjectBtn" class="w-full py-3 px-5 bg-white/30 text-slate-700 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-white/50 transition-all duration-200 text-sm border border-black/5">
+<span class="material-symbols-outlined text-lg">folder</span> Nuevo Proyecto
+</button>
+</div>
+<div class="px-6 pb-2">
+<button id="newNoteButton" class="w-full py-4 px-6 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all duration-200">
+<span class="material-symbols-outlined">add</span> Nueva Nota
+</button>
+</div>
+<div class="px-6 pb-6">
+<button id="logoutButton" class="w-full py-3 px-5 text-on-surface-variant rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-200 text-sm">
+<span class="material-symbols-outlined">logout</span> Cerrar Sesión
+</button>
+</div>
+</aside>
 
-    <main class="editor-panel">
-      <div class="editor-topbar">
-        <input id="noteTitle" class="title-input" type="text" placeholder="Titulo de la nota">
-        <div class="editor-actions">
-          <button id="saveNoteButton" class="button primary" type="button" onclick="window.NotyNotes.saveNote()">Guardar</button>
-          <button id="deleteNoteButton" class="button danger" type="button" onclick="window.NotyNotes.deleteNote()">Eliminar</button>
-          <button id="exportPdfButton" class="button secondary" type="button" onclick="window.NotyNotes.exportNoteToPdf()">Exportar PDF</button>
-        </div>
-      </div>
+<main class="ml-64 min-h-screen">
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface/80 backdrop-blur-md border-b border-glass-border flex justify-between items-center pl-gutter pr-10 z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input id="searchInput" class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Buscar notas..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-sm font-mono text-slate-400 px-2" id="currentDate"></span>
+<button id="addTaskBtn" class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container rounded-full hover:scale-95 transition-transform duration-150 font-semibold">
+<span class="material-symbols-outlined">add</span>
+<span class="text-label-caps">Añadir Nota</span>
+</button>
+<button id="alertsBtn" class="w-9 h-9 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-surface-container-higher transition-all duration-200" title="Alertas">
+<span class="material-symbols-outlined text-lg">notifications</span>
+</button>
+<button id="settingsBtn" class="w-9 h-9 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-surface-container-higher transition-all duration-200" title="Configuración">
+<span class="material-symbols-outlined text-lg">settings</span>
+</button>
+<div id="userAvatar" class="w-8 h-8 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold text-sm overflow-hidden"><img id="avatarImg" class="w-full h-full object-cover hidden"/><span id="avatarInitial" class="text-primary font-bold text-sm">U</span></div>
+</div>
+</header>
 
-      <div class="toolbar" aria-label="Barra de formato">
-        <button data-command="formatBlock" data-value="h1" type="button">H1</button>
-        <button data-command="formatBlock" data-value="h2" type="button">H2</button>
-        <button data-command="formatBlock" data-value="h3" type="button">H3</button>
-        <button data-command="bold" type="button">B</button>
-        <button data-command="italic" type="button">I</button>
-        <button data-command="insertUnorderedList" type="button">Lista</button>
-        <button data-command="insertOrderedList" type="button">1. Lista</button>
-        <button data-command="formatBlock" data-value="p" type="button">Parrafo</button>
-      </div>
+<div class="pt-24 px-gutter pb-margin-desktop max-w-max-width mx-auto" id="mainContent">
+<div id="inboxView" class="view-section">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8" id="statsGrid">
+<div class="glass-card p-5 rounded-xl"><span class="material-symbols-outlined text-primary">note_stack</span><p class="text-2xl font-bold mt-2" id="statTotalNotes">0</p><p class="text-sm text-slate-500">Total notas</p></div>
+<div class="glass-card p-5 rounded-xl"><span class="material-symbols-outlined text-emerald-600">auto_awesome</span><p class="text-2xl font-bold mt-2" id="statRecentNotes">0</p><p class="text-sm text-slate-500">Notas esta semana</p></div>
+<div class="glass-card p-5 rounded-xl"><span class="material-symbols-outlined text-violet-600">folder_open</span><p class="text-2xl font-bold mt-2" id="statProjects">0</p><p class="text-sm text-slate-500">Proyectos</p></div>
+</div>
+<div class="glass-card p-6 rounded-xl mb-6"><h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-lg">history</span> Notas recientes</h3><div id="recentNotesList" class="space-y-2 min-h-[80px] text-sm text-slate-400">Cargando...</div></div>
+<div class="glass-card p-6 rounded-xl"><h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-lg">schedule</span> Último proyecto abierto</h3><div id="lastProjectInfo" class="text-sm text-slate-400">Ninguno</div></div>
+</div>
+<div id="notesView" class="view-section">
+<div class="flex items-end justify-between mb-8">
+<div>
+<h2 class="text-headline-lg font-bold text-text-main">Mis Notas</h2>
+<p class="text-text-muted mt-2 text-body-md" id="notesCount">Cargando notas...</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="notesGrid"></div>
+</div>
+<div id="proyectosView" class="view-section">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-headline-lg font-bold text-text-main">Proyectos</h2>
+<button id="newProjectFromView" class="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:-translate-y-0.5 transition-all"><span class="material-symbols-outlined text-lg">add</span> Nuevo Proyecto</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5" id="projectsGrid"></div>
+</div>
+<div id="proximosView" class="view-section">
+<div class="flex items-center gap-6 mb-6">
+<h2 class="text-headline-lg font-bold text-text-main">Próximo</h2>
+<div class="flex items-center gap-2"><button id="calPrev" class="w-9 h-9 flex items-center justify-center bg-white/60 border border-glass-border rounded-full hover:bg-white hover:shadow-sm transition-all active:scale-90"><span class="material-symbols-outlined text-lg text-slate-500">chevron_left</span></button><span id="calMonth" class="font-semibold text-sm w-32 text-center text-slate-700"></span><button id="calNext" class="w-9 h-9 flex items-center justify-center bg-white/60 border border-glass-border rounded-full hover:bg-white hover:shadow-sm transition-all active:scale-90"><span class="material-symbols-outlined text-lg text-slate-500">chevron_right</span></button></div>
+</div>
+<div class="glass-card rounded-2xl p-4" style="background:rgba(255,255,255,0.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2)">
+<table class="w-full" style="border-collapse:separate;border-spacing:2px"><thead><tr id="calHeader"></tr></thead><tbody id="calBody"></tbody></table>
+</div>
+<div class="mt-5" id="dayNotesPanel"><div class="glass-card rounded-2xl p-5 text-center"><span class="material-symbols-outlined text-3xl text-slate-300 mb-2">calendar_month</span><p class="text-sm text-slate-400">Selecciona un día para ver o agregar notas</p></div></div>
+</div>
+</div>
+</main>
 
-      <section id="noteEditor" class="note-editor" contenteditable="true" aria-label="Editor de contenido">
-        <p>Escribe tu nota aqui...</p>
-      </section>
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="modal-overlay" id="projectModalOverlay"></div>
+<div class="modal-panel-sm" id="projectModal">
+<div class="p-6"><h3 class="text-lg font-bold text-slate-800 mb-4">Nuevo Proyecto</h3><input id="projectNameInput" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="Nombre del proyecto" type="text"/><div class="flex justify-end gap-3 mt-5"><button id="projectModalCancel" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-all">Cancelar</button><button id="projectModalCreate" class="px-5 py-2 bg-primary text-white rounded-xl text-sm font-semibold hover:-translate-y-0.5 active:scale-95 transition-all">Crear</button></div></div>
+</div>
 
-      <p id="message" class="message success" role="status">Dashboard v4 cargado.</p>
-    </main>
-  </div>
+<div class="modal-overlay" id="settingsOverlay"></div>
+<div class="modal-panel" style="max-width:460px" id="settingsModal">
+<div class="p-8">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-headline-md font-bold text-slate-800">Configuración</h3>
+<button id="closeSettings" class="p-1 hover:bg-black/5 rounded-lg transition-all"><span class="material-symbols-outlined text-slate-400">close</span></button>
+</div>
+<form id="settingsForm" class="space-y-5">
+<div class="flex justify-center mb-2">
+<div class="avatar-upload relative w-20 h-20 cursor-pointer" id="settingsAvatarUpload">
+<img id="settingsAvatarPreview" class="w-full h-full rounded-xl object-cover border-2 border-white/50 shadow-sm" src="/public/logo.png" alt="Avatar"/>
+<div class="absolute inset-0 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/30"><span class="material-symbols-outlined text-white">camera_alt</span></div>
+<input id="settingsAvatarInput" type="file" accept="image/*" class="hidden"/>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Nombre completo</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">person</span>
+<input id="settingsName" class="w-full pl-12 pr-4 py-3 bg-white/20 border border-glass-border rounded-lg focus:outline-none input-glow transition-all placeholder:text-outline/60 text-on-surface" type="text" required/>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Tipo de usuario</label>
+<div class="grid grid-cols-3 gap-2">
+<label class="flex flex-col items-center gap-1 p-3 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+<input type="radio" name="settingsUserType" value="estudiante" class="hidden"/>
+<span class="material-symbols-outlined text-outline">school</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Estudiante</span>
+</label>
+<label class="flex flex-col items-center gap-1 p-3 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+<input type="radio" name="settingsUserType" value="profesional" class="hidden"/>
+<span class="material-symbols-outlined text-outline">work</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Profesional</span>
+</label>
+<label class="flex flex-col items-center gap-1 p-3 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary">
+<input type="radio" name="settingsUserType" value="personal" class="hidden"/>
+<span class="material-symbols-outlined text-outline">favorite</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Personal</span>
+</label>
+</div>
+</div>
+<button type="submit" class="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:-translate-y-0.5 active:scale-95 transition-all">Guardar cambios</button>
+<p id="settingsMessage" class="text-sm text-center" role="status"></p>
+</form>
+</div>
+</div>
 
-  <script>
-    const API_BASE_URL = window.location.port === "3000"
-      ? "/api"
-      : "http://localhost:3000/api";
-    const notesList = document.querySelector("#notesList");
-    const noteTitle = document.querySelector("#noteTitle");
-    const noteEditor = document.querySelector("#noteEditor");
-    const messageElement = document.querySelector("#message");
-    const newNoteButton = document.querySelector("#newNoteButton");
-    const logoutButton = document.querySelector("#logoutButton");
-    const toolbar = document.querySelector(".toolbar");
+<div class="modal-overlay" id="shareOverlay"></div>
+<div class="modal-panel-sm" style="max-width:420px;z-index:105" id="shareModal">
+<div class="p-6">
+<div class="flex items-center justify-between mb-5">
+<h3 class="text-lg font-bold text-slate-800">Compartir nota</h3>
+<button id="closeShare" class="p-1 hover:bg-black/5 rounded-lg transition-all"><span class="material-symbols-outlined text-slate-400">close</span></button>
+</div>
+<div id="shareContent">
+<div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl mb-4">
+<div id="shareNoteInfo" class="flex-1 min-w-0">
+<p id="shareNoteTitle" class="text-sm font-semibold text-slate-700 truncate"></p>
+<p id="shareNoteStatus" class="text-xs text-slate-400">Solo tú</p>
+</div>
+</div>
+<div class="flex gap-2 mb-4">
+<input id="shareLinkInput" class="flex-1 px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 select-all focus:outline-none" readonly type="text"/>
+<button id="copyShareLink" class="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:-translate-y-0.5 active:scale-95 transition-all shrink-0">Copiar</button>
+</div>
+<div class="border-t border-slate-100 pt-4">
+<p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">En línea ahora</p>
+<div id="onlineUsers" class="space-y-2">
+<div class="flex items-center gap-2 text-sm text-slate-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Solo tú</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-    let notes = [];
-    let selectedNoteId = null;
+<div class="modal-overlay" id="notifOverlay"></div>
+<div class="modal-panel-sm" style="max-width:380px;top:70px;left:auto;right:24px;transform:none" id="notifPanel">
+<div class="p-5">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-sm font-bold text-slate-700">Alertas</h4>
+<button id="clearNotifBtn" class="text-xs text-primary font-semibold hover:underline">Limpiar todo</button>
+</div>
+<div id="notifList" class="space-y-2 min-h-[60px]">
+<p class="text-sm text-slate-400 text-center py-4">No hay alertas nuevas</p>
+</div>
+</div>
+</div>
 
-    function showMessage(text, type = "info") {
-      messageElement.textContent = text;
-      messageElement.className = `message ${type}`;
-    }
+<div class="modal-panel" id="modalPanel">
+<div class="flex items-center justify-between px-8 pt-8 pb-4 border-b border-black/5">
+<input id="noteTitle" class="w-full text-xl font-semibold bg-transparent border-none focus:outline-none placeholder:text-slate-300 mr-4" type="text" placeholder="Título de la nota"/>
+<div class="flex items-center gap-1.5 shrink-0">
+<button id="saveNoteButton" onclick="window.NotyNotes.saveNote()" class="flex items-center gap-1.5 px-4 py-2 bg-[#2563EB] text-white rounded-xl font-semibold text-sm hover:-translate-y-0.5 active:scale-[0.96] transition-all duration-200 shadow-sm" title="Guardar (Ctrl+S)">
+<span class="material-symbols-outlined text-lg">save</span> Guardar
+</button>
+<button id="exportPdfBtn" onclick="window.NotyNotes.exportNoteToPdf()" class="p-2 hover:bg-black/5 rounded-xl transition-all duration-200 active:scale-[0.96]" title="Exportar PDF">
+<span class="material-symbols-outlined text-slate-500">picture_as_pdf</span>
+</button>
+<button id="fullscreenNoteBtn" class="p-2 hover:bg-black/5 rounded-xl transition-all duration-200 active:scale-[0.96]" title="Abrir en página completa">
+<span class="material-symbols-outlined text-slate-500">open_in_new</span>
+</button>
+<button id="closeModal" class="p-2 hover:bg-black/5 rounded-xl transition-all duration-200 active:scale-[0.96]" title="Cerrar (Esc)">
+<span class="material-symbols-outlined text-slate-400">close</span>
+</button>
+</div>
+</div>
+<div id="editorToolbar" class="sticky top-0 z-10 flex items-center justify-center border-b border-black/5 bg-white/95 py-2">
+<div class="toolbar-container flex items-center">
+<div class="relative" id="headingDropdownWrap">
+<button id="headingSelectBtn" class="flex items-center gap-2 px-4 py-2 bg-[#f1f5f9] rounded-xl text-sm font-semibold text-slate-800 hover:bg-[#e2e8f0] transition-all active:scale-95" title="Estilo de texto">
+<span id="headingSelectLabel">Párrafo</span>
+<span class="material-symbols-outlined text-base text-slate-400">expand_more</span>
+</button>
+<div id="headingDropdown" class="absolute top-full left-0 mt-1.5 bg-white rounded-2xl shadow-lg border border-[rgba(0,0,0,0.06)] p-1.5 min-w-[160px] z-50 opacity-0 pointer-events-none scale-95 transition-all duration-150" style="transform-origin:top left">
+<button data-value="p" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Párrafo</button>
+<button data-value="h1" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Encabezado 1</button>
+<button data-value="h2" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Encabezado 2</button>
+<button data-value="h3" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Encabezado 3</button>
+</div>
+</div>
+<div class="toolbar-divider"></div>
+<button data-cmd="bold" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Bold (Ctrl+B)">
+<b style="font-size:15px;font-weight:800">B</b>
+</button>
+<button data-cmd="italic" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Italic (Ctrl+I)">
+<span style="font-size:16px">𝑰</span>
+</button>
+<button data-cmd="underline" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Underline (Ctrl+U)">
+<u style="font-size:15px;text-decoration:underline">U</u>
+</button>
+<div class="toolbar-divider"></div>
+<button data-cmd="insertUnorderedList" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Lista">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
+</button>
+<button data-cmd="insertOrderedList" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Lista numerada">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="5" x2="21" y2="5"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="19" x2="21" y2="19"/><text x="3" y="7" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">1</text><text x="3" y="14" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">2</text><text x="3" y="21" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">3</text></svg>
+</button>
+<div class="toolbar-divider"></div>
+<button data-cmd="justifyLeft" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Alinear izquierda">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="5" x2="20" y2="5"/><line x1="4" y1="10" x2="15" y2="10"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="4" y1="20" x2="13" y2="20"/></svg>
+</button>
+<button data-cmd="justifyCenter" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Centrar">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="5"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg>
+</button>
+<button data-cmd="justifyRight" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Alinear derecha">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="5" x2="20" y2="5"/><line x1="9" y1="10" x2="20" y2="10"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="11" y1="20" x2="20" y2="20"/></svg>
+</button>
+<div class="toolbar-divider"></div>
+<div class="color-btn-wrap relative">
+<button id="colorBtn" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Color de texto">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><text x="5" y="16" font-size="12" font-weight="700" font-family="Inter,sans-serif">A</text><line x1="3" y1="19" x2="15" y2="19" stroke="#2563EB" stroke-width="2.5"/></svg>
+</button>
+<div id="colorDropdown" class="color-dropdown hidden">
+<div class="color-dropdown-inner">
+<div class="color-grid" id="colorGrid"></div>
+<div class="color-custom-section">
+<span class="color-custom-title">PERSONALIZADO</span>
+<div class="color-custom-row">
+<div class="color-swatch selected" style="background:#1e293b" data-color="#1e293b"></div>
+<div class="color-swatch" style="background:#475569" data-color="#475569"></div>
+<button class="color-add-btn" title="Agregar color">+</button>
+<button class="color-eyedropper-btn" title="Cuentagotas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l3-3 1 1z"/><path d="M8 16l4-4"/><path d="M14 10l-2-2"/><path d="M16.5 2.5a2.121 2.121 0 0 1 3 3L12 13l-3-3 7.5-7.5z"/><path d="M12 13l-3-3"/></svg></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<button data-cmd="outdent" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Disminuir sangría">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="5" x2="21" y2="5"/><line x1="13" y1="10" x2="21" y2="10"/><line x1="13" y1="15" x2="21" y2="15"/><line x1="13" y1="20" x2="21" y2="20"/><polyline points="9,16 5,12 9,8"/></svg>
+</button>
+<button data-cmd="indent" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Aumentar sangría">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="5" x2="21" y2="5"/><line x1="13" y1="10" x2="21" y2="10"/><line x1="13" y1="15" x2="21" y2="15"/><line x1="13" y1="20" x2="21" y2="20"/><polyline points="5,16 9,12 5,8"/></svg>
+</button>
+</div>
+</div>
+<div class="overflow-y-auto flex-1 px-8 py-6">
+<section id="noteEditor" class="note-editor min-h-[300px] text-[15px] leading-relaxed text-slate-800" contenteditable="true" spellcheck="true" lang="es" aria-label="Editor de contenido"><p>Escribe tu nota aquí...</p></section>
+</div>
+<div class="px-8 pb-5">
+<p id="message" class="text-sm text-center" role="status"></p>
+</div>
+</div>
 
-    function getToken() {
-      return localStorage.getItem("noty_token");
-    }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/yjs@13.6.18/dist/y.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/y-webrtc@10.4.0/dist/y-webrtc.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/y-indexeddb@9.0.12/dist/y-indexeddb.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+const notesGrid=document.querySelector("#notesGrid");
+const notesCount=document.querySelector("#notesCount");
+const noteTitle=document.querySelector("#noteTitle");
+const noteEditor=document.querySelector("#noteEditor");
+const messageElement=document.querySelector("#message");
+const newNoteButton=document.querySelector("#newNoteButton");
+const addTaskBtn=document.querySelector("#addTaskBtn");
+const logoutButton=document.querySelector("#logoutButton");
+const searchInput=document.querySelector("#searchInput");
+const modalOverlay=document.querySelector("#modalOverlay");
+const modalPanel=document.querySelector("#modalPanel");
+const closeModal=document.querySelector("#closeModal");
+const exportPdfBtn=document.querySelector("#exportPdfBtn");
+const fullscreenNoteBtn=document.querySelector("#fullscreenNoteBtn");
 
-    function removeToken() {
-      localStorage.removeItem("noty_token");
-      localStorage.removeItem("noty_user");
-    }
+let notes=[];
+let selectedNoteId=null;
+let searchQuery="";
+let ydoc=null;
+let ytext=null;
+let ywebsocket=null;
+let isRemoteUpdate=false;
 
-    async function apiRequest(path, options = {}) {
-      const token = getToken();
+window.NotyNotes={saveNote:()=>saveNote(),exportNoteToPdf:()=>exportNoteToPdf()};
 
-      if (!token) {
-        window.location.href = "login.html";
-        throw new Error("Debes iniciar sesion.");
+document.getElementById("currentDate").textContent=new Date().toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"});
+
+function showMessage(text,type="info"){messageElement.innerHTML=text;messageElement.className=`text-sm text-center ${type==="error"?"text-error":type==="success"?"text-primary":"text-on-surface-variant/60"}`;if(type!=="info")setTimeout(()=>{messageElement.innerHTML="&nbsp;";messageElement.className="text-sm text-center"},3000)}
+
+function protectDashboard(){if(!getToken()){window.location.href="login.html";return false}return true}
+
+function formatDate(d){const date=new Date(d);const now=new Date();const diff=now-date;if(diff<86400000&&date.getDate()===now.getDate())return date.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});if(diff<172800000&&date.getDate()===now.getDate()-1)return"Ayer";return date.toLocaleDateString("es-ES",{day:"numeric",month:"short"})}
+
+function truncateText(text,len=100){const el=document.createElement("div");el.innerHTML=text;const plain=el.textContent||el.innerText||"";return plain.length>len?plain.substring(0,len)+"...":plain}
+
+function getTags(content){const tags=[];const el=document.createElement("div");el.innerHTML=content;const text=el.textContent||"";if(text.length<30)tags.push("Borrador");else tags.push("Completada");return tags}
+
+function openEditor(note){
+  selectedNoteId=note?note.id:null;
+  noteTitle.value=note?note.title:"";
+  noteEditor.innerHTML=note?note.content:"<p>Escribe tu nota aquí...</p>";
+  modalOverlay.classList.add("active");
+  modalPanel.classList.add("active");
+  noteTitle.focus();
+  initCollab(note?.id);
+}
+
+function closeEditor(){
+  modalOverlay.classList.remove("active");
+  modalPanel.classList.remove("active");
+  destroyCollab()
+}
+
+function initCollab(noteId){
+  destroyCollab();
+  if(!noteId||!getToken())return;
+  try{
+    ydoc=new Y.Doc();
+    ytext=ydoc.getText("content");
+    const provider=new Y.WebRTC(ydoc,{room:`note-${noteId}`,signaling:["wss://y-webrtc-signaling.onrender.com"],maxBackoffTime:5000});
+    ywebsocket=provider;
+    ytext.observe((event)=>{
+      if(isRemoteUpdate)return;
+      const remoteHtml=ytext.toString();
+      if(remoteHtml&&remoteHtml!==noteEditor.innerHTML){
+        isRemoteUpdate=true;
+        noteEditor.innerHTML=remoteHtml;
+        isRemoteUpdate=false;
       }
-
-      let response;
-
-      try {
-        response = await fetch(`${API_BASE_URL}${path}`, {
-          ...options,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            ...(options.headers || {})
-          }
-        });
-      } catch (error) {
-        throw new Error("No se pudo conectar con el backend en http://localhost:3000.");
-      }
-
-      const responseText = await response.text();
-      let data;
-
-      try {
-        data = JSON.parse(responseText);
-      } catch (error) {
-        throw new Error("La API no devolvio JSON. Abre la app desde http://localhost:3000/login.html y verifica que el backend este activo.");
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || "Error inesperado en la API.");
-      }
-
-      return data;
-    }
-
-    function setEditor(note) {
-      selectedNoteId = note ? note.id : null;
-      noteTitle.value = note ? note.title : "";
-      noteEditor.innerHTML = note ? note.content : "<p>Escribe tu nota aqui...</p>";
-      renderNotesList();
-    }
-
-    function renderNotesList() {
-      notesList.innerHTML = "";
-
-      if (notes.length === 0) {
-        notesList.innerHTML = '<p class="empty-state">No hay notas todavia.</p>';
-        return;
-      }
-
-      notes.forEach((note) => {
-        const button = document.createElement("button");
-        button.className = note.id === selectedNoteId ? "note-item active" : "note-item";
-        button.type = "button";
-
-        const title = document.createElement("strong");
-        title.textContent = note.title;
-
-        const date = document.createElement("span");
-        date.textContent = new Date(note.updated_at).toLocaleString();
-
-        button.append(title, date);
-        button.addEventListener("click", () => setEditor(note));
-        notesList.appendChild(button);
-      });
-    }
-
-    async function loadNotes() {
-      try {
-        notes = await apiRequest("/notes");
-        setEditor(notes[0] || null);
-        showMessage("Editor listo.", "success");
-      } catch (error) {
-        showMessage(error.message, "error");
-      }
-    }
-
-    async function saveNote() {
-      showMessage("Guardando nota...");
-
-      const title = noteTitle.value.trim();
-      const content = noteEditor.innerHTML.trim();
-
-      if (!title || !content) {
-        showMessage("El titulo y el contenido son obligatorios.", "error");
-        return;
-      }
-
-      try {
-        if (selectedNoteId) {
-          await apiRequest(`/notes/${selectedNoteId}`, {
-            method: "PUT",
-            body: JSON.stringify({ title, content })
-          });
-          showMessage("Nota actualizada correctamente.", "success");
-        } else {
-          const data = await apiRequest("/notes", {
-            method: "POST",
-            body: JSON.stringify({ title, content })
-          });
-          selectedNoteId = data.note.id;
-          showMessage("Nota creada correctamente.", "success");
-        }
-
-        await loadNotes();
-      } catch (error) {
-        showMessage(error.message, "error");
-      }
-    }
-
-    async function deleteNote() {
-      if (!selectedNoteId) {
-        showMessage("Selecciona una nota antes de eliminar.", "error");
-        return;
-      }
-
-      if (!window.confirm("Quieres eliminar esta nota?")) {
-        return;
-      }
-
-      try {
-        await apiRequest(`/notes/${selectedNoteId}`, { method: "DELETE" });
-        showMessage("Nota eliminada correctamente.", "success");
-        await loadNotes();
-      } catch (error) {
-        showMessage(error.message, "error");
-      }
-    }
-
-    function exportNoteToPdf() {
-      if (!noteTitle.value.trim()) {
-        showMessage("Escribe un titulo antes de exportar.", "error");
-        return;
-      }
-
-      const printWindow = window.open("", "_blank");
-
-      if (!printWindow) {
-        showMessage("El navegador bloqueo la ventana de impresion.", "error");
-        return;
-      }
-
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8">
-          <title>${noteTitle.value}</title>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 32px; }
-          </style>
-        </head>
-        <body>
-          <h1>${noteTitle.value}</h1>
-          <div>${noteEditor.innerHTML}</div>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-      showMessage("Usa Guardar como PDF en la ventana de impresion.", "success");
-    }
-
-    window.NotyNotes = {
-      saveNote,
-      deleteNote,
-      exportNoteToPdf
-    };
-
-    toolbar.addEventListener("click", (event) => {
-      const button = event.target.closest("button");
-
-      if (!button) {
-        return;
-      }
-
-      document.execCommand(button.dataset.command, false, button.dataset.value || null);
-      noteEditor.focus();
     });
+    noteEditor.addEventListener("input",onEditorInput);
+  }catch(e){console.warn("Collab init error:",e)}
+}
+function onEditorInput(){
+  if(isRemoteUpdate||!ytext)return;
+  isRemoteUpdate=true;
+  ytext.delete(0,ytext.length);
+  ytext.insert(0,noteEditor.innerHTML);
+  isRemoteUpdate=false;
+}
+function destroyCollab(){
+  if(ywebsocket){try{ywebsocket.destroy()}catch(e){}}
+  if(ydoc){ydoc.destroy()}
+  ydoc=null;ytext=null;ywebsocket=null;
+  noteEditor.removeEventListener("input",onEditorInput);
+}
 
-    newNoteButton.addEventListener("click", () => setEditor(null));
+function renderNotes(){const query=searchQuery.toLowerCase().trim();let filtered=notes;if(query)filtered=notes.filter(n=>n.title.toLowerCase().includes(query)||truncateText(n.content).toLowerCase().includes(query));notesGrid.innerHTML="";if(filtered.length===0){notesGrid.innerHTML=`<div class="col-span-full flex flex-col items-center justify-center py-16 text-on-surface-variant/50"><span class="material-symbols-outlined text-6xl mb-4">${query?"search_off":"note_add"}</span><p class="text-lg font-semibold">${query?"Sin resultados para \""+query+"\"":"Aún no has escrito ninguna nota..."}</p><p class="text-sm mt-1">${query?"Intenta con otros términos":"Crea tu primera nota con el botón de arriba"}</p></div>`;notesCount.textContent="0 notas";return}
+notesCount.textContent=`${filtered.length} ${filtered.length===1?"nota":"notas"}`;filtered.forEach((note)=>{const card=document.createElement("div");card.className="glass-card p-6 rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group cursor-pointer";card.dataset.noteId=note.id;const preview=truncateText(note.content,120);const tags=getTags(note.content);card.innerHTML=`
+<div class="flex justify-between items-start mb-4">
+<input class="custom-checkbox w-6 h-6 rounded-lg border-2 border-outline-variant text-primary focus:ring-0 transition-colors" type="checkbox"/>
+<div class="relative note-menu-wrap">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-lg note-menu-btn">more_vert</span>
+<div class="note-menu absolute right-0 top-6 bg-white rounded-2xl shadow-xl border border-[rgba(0,0,0,0.06)] p-1.5 min-w-[140px] z-50 opacity-0 pointer-events-none scale-95 transition-all duration-150" style="transform-origin:top right">
+<button data-action="rename" class="note-menu-item w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all"><span class="material-symbols-outlined text-base">edit</span> Renombrar</button>
+<button data-action="share" class="note-menu-item w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all"><span class="material-symbols-outlined text-base">share</span> Compartir</button>
+<hr class="mx-2 my-1 border-[rgba(0,0,0,0.06)]"/>
+<button data-action="delete" class="note-menu-item w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"><span class="material-symbols-outlined text-base">delete</span> Eliminar</button>
+</div>
+</div>
+</div>
+<h3 class="text-headline-md font-semibold text-on-surface mb-2 line-clamp-2">${note.title}</h3>
+<p class="text-text-muted mb-6 flex-1 text-sm leading-relaxed">${preview}</p>
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex flex-wrap gap-2">${tags.map(t=>`<span class="px-3 py-1 rounded-full text-label-caps font-semibold ${t==="Borrador"?"bg-secondary/10 text-secondary":"bg-primary/10 text-primary"}">${t}</span>`).join("")}</div>
+<span class="text-xs font-mono text-on-surface-variant/60">${formatDate(note.updated_at)}</span>
+</div>
+`;card.addEventListener("click",(e)=>{if(e.target.closest(".custom-checkbox")||e.target.closest(".note-menu-wrap"))return;openEditor(note)});const cb=card.querySelector(".custom-checkbox");cb.addEventListener("change",function(){if(this.checked){card.style.opacity="0.5";card.style.filter="grayscale(0.5)"}else{card.style.opacity="1";card.style.filter="none"};this.classList.add("scale-125");setTimeout(()=>this.classList.remove("scale-125"),150)});notesGrid.appendChild(card)})}
 
-    logoutButton.addEventListener("click", () => {
-      removeToken();
-      window.location.href = "login.html";
-    });
+async function loadNotes(){try{notes=await apiRequest("/notes");renderNotes()}catch(error){notesCount.textContent="Error al cargar";showMessage(error.message,"error")}}
 
-    if (!getToken()) {
-      window.location.href = "login.html";
-    } else {
-      loadNotes();
+// Note card menu
+document.addEventListener("click",(e)=>{
+  const menu=e.target.closest(".note-menu-btn");
+  const wrap=e.target.closest(".note-menu-wrap");
+  document.querySelectorAll(".note-menu").forEach(m=>{if(m!==wrap?.querySelector(".note-menu"))m.classList.remove("active")});
+  if(menu){const m=menu.parentElement.querySelector(".note-menu");m.classList.toggle("active")}
+});
+
+document.addEventListener("click",(e)=>{
+  const item=e.target.closest(".note-menu-item");
+  if(!item)return;
+  item.closest(".note-menu").classList.remove("active");
+  const action=item.dataset.action;
+  const card=item.closest("[data-note-id]");
+  const noteId=parseInt(card?.dataset.noteId);
+  const note=notes.find(n=>n.id===noteId);
+  if(!note)return;
+  if(action==="delete"){
+    if(!confirm("¿Eliminar esta nota?"))return;
+    (async()=>{try{await apiRequest(`/notes/${noteId}`,{method:"DELETE"});showMessage("Nota eliminada","success");addNotification("Nota eliminada: "+note.title,"info");await loadNotes()}catch(e){showMessage(e.message,"error")}})()
+  }else if(action==="rename"){
+    const newTitle=prompt("Nuevo título:",note.title);
+    if(!newTitle||!newTitle.trim()||newTitle.trim()===note.title)return;
+    (async()=>{try{await apiRequest(`/notes/${noteId}`,{method:"PUT",body:JSON.stringify({title:newTitle.trim(),content:note.content})});showMessage("Nota renombrada","success");await loadNotes()}catch(e){showMessage(e.message,"error")}})()
+  }else if(action==="share"){
+    openShareModal(note);
+  }
+});
+
+async function saveNote(){showMessage("Guardando...","info");const title=noteTitle.value.trim();const content=noteEditor.innerHTML.trim();if(!title||!content){showMessage("El título y el contenido son obligatorios.","error");return}
+try{if(selectedNoteId){await apiRequest(`/notes/${selectedNoteId}`,{method:"PUT",body:JSON.stringify({title,content})});showMessage("Nota actualizada","success");addNotification("Nota actualizada: "+title,"success")}else{const data=await apiRequest("/notes",{method:"POST",body:JSON.stringify({title,content})});selectedNoteId=data.note.id;showMessage("Nota creada","success");addNotification("Nueva nota creada: "+title,"success")}
+await loadNotes()}catch(error){showMessage(error.message,"error")}}
+
+async function deleteNote(){if(!selectedNoteId){showMessage("Selecciona una nota primero","error");return}
+if(!window.confirm("¿Eliminar esta nota?"))return
+try{const delTitle=noteTitle.value.trim();await apiRequest(`/notes/${selectedNoteId}`,{method:"DELETE"});showMessage("Nota eliminada","success");addNotification("Nota eliminada: "+delTitle,"info");closeEditor();await loadNotes()}catch(error){showMessage(error.message,"error")}}
+
+function exportNoteToPdf(){if(!noteTitle.value.trim()){showMessage("Escribe un título primero","error");return}
+const el=document.createElement("div");el.innerHTML=`<h1 style="color:#005ab6;font-size:28px;font-weight:700;margin-bottom:16px">${noteTitle.value}</h1><div style="font-family:Inter,Arial,sans-serif;line-height:1.6;color:#1E293B">${noteEditor.innerHTML}</div>`;
+showMessage("Generando PDF...","info");
+html2pdf().set({margin:14,filename:`${noteTitle.value.trim()}.pdf`,html2canvas:{scale:2,useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}}).from(el).save().then(()=>showMessage("PDF descargado","success")).catch(()=>showMessage("Error al generar PDF","error"))}
+
+// Toolbar
+document.querySelectorAll(".toolbar-btn").forEach(btn=>{btn.addEventListener("click",function(){const cmd=this.dataset.cmd;const val=this.dataset.val||null;if(cmd==="formatBlock"&&val){document.execCommand("formatBlock",false,val)}else{document.execCommand(cmd,false,val)}noteEditor.focus()})});
+const headingSelectBtn=document.getElementById("headingSelectBtn");
+const headingSelectLabel=document.getElementById("headingSelectLabel");
+const headingDropdown=document.getElementById("headingDropdown");
+const headingOptions=document.querySelectorAll(".heading-option");
+
+function setHeading(value,label){
+  document.execCommand("formatBlock",false,value);
+  headingSelectLabel.textContent=label;
+  headingOptions.forEach(o=>o.classList.toggle("active",o.dataset.value===value));
+  closeHeadingDropdown();
+  noteEditor.focus();
+}
+
+function toggleHeadingDropdown(){
+  if(headingDropdown.classList.contains("active"))closeHeadingDropdown();
+  else{headingDropdown.classList.add("active");headingDropdown.classList.remove("scale-95")}
+}
+
+function closeHeadingDropdown(){headingDropdown.classList.remove("active");headingDropdown.classList.add("scale-95")}
+
+headingSelectBtn.addEventListener("click",(e)=>{e.stopPropagation();toggleHeadingDropdown()});
+headingOptions.forEach(o=>{o.addEventListener("click",()=>setHeading(o.dataset.value,o.textContent.trim()))});
+document.addEventListener("click",(e)=>{if(!e.target.closest("#headingDropdownWrap"))closeHeadingDropdown()});
+
+noteEditor.addEventListener("mouseup",updateToolbarState);
+noteEditor.addEventListener("keyup",updateToolbarState);
+function updateToolbarState(){["bold","italic","underline","insertUnorderedList","insertOrderedList","justifyLeft","justifyCenter","justifyRight"].forEach(cmd=>{const active=document.queryCommandState(cmd);document.querySelectorAll(`[data-cmd="${cmd}"]`).forEach(b=>b.classList.toggle("active",active))});const parent=document.getSelection()?.focusNode?.parentElement;if(parent){const h=parent.closest("h1,h2,h3,p,div");const tag=h?.tagName?.toLowerCase();if(tag==="h1")setHeading("h1","Encabezado 1");else if(tag==="h2")setHeading("h2","Encabezado 2");else if(tag==="h3")setHeading("h3","Encabezado 3");else if(tag==="p")setHeading("p","Párrafo")}}
+// Color picker
+const COLORS=[
+["#000000","#1f2937","#374151","#4b5563","#6b7280","#9ca3af","#d1d5db","#e5e7eb","#f3f4f6","#ffffff"],
+["#7f1d1d","#dc2626","#ea580c","#f59e0b","#84cc16","#10b981","#14b8a6","#06b6d4","#3b82f6","#8b5cf6"],
+["#fca5a5","#fbbf24","#fde68a","#d9f99d","#a7f3d0","#99f6e4","#a5f3fc","#93c5fd","#c4b5fd","#f9a8d4"],
+["#f87171","#f59e0b","#fcd34d","#bef264","#6ee7b7","#5eead4","#67e8f9","#60a5fa","#a78bfa","#f472b6"],
+["#ef4444","#d97706","#fbbf24","#a3e635","#34d399","#2dd4bf","#22d3ee","#3b82f6","#8b5cf6","#ec4899"],
+["#dc2626","#b45309","#f59e0b","#84cc16","#10b981","#14b8a6","#06b6d4","#2563eb","#7c3aed","#db2777"],
+["#b91c1c","#92400e","#d97706","#65a30d","#059669","#0d9488","#0891b2","#1d4ed8","#6d28d9","#be185d"],
+["#991b1b","#78350f","#b45309","#4d7c0f","#047857","#0f766e","#0e7490","#1e40af","#5b21b6","#9d174d"]
+];
+const colorGrid=document.getElementById("colorGrid");
+COLORS.forEach(row=>{row.forEach(c=>{const s=document.createElement("button");s.className="color-swatch";s.style.background=c;s.dataset.color=c;if(c==="#ffffff")s.style.borderColor="#d1d5db";s.addEventListener("click",function(e){e.stopPropagation();document.execCommand("foreColor",false,this.dataset.color);noteEditor.focus();closeColorPicker();updateColorIndicator(this.dataset.color)});colorGrid.appendChild(s)})});
+const colorBtn=document.getElementById("colorBtn");
+const colorDropdown=document.getElementById("colorDropdown");
+function closeColorPicker(){colorDropdown.classList.add("hidden")}
+function openColorPicker(){colorDropdown.classList.remove("hidden")}
+colorBtn.addEventListener("click",function(e){e.stopPropagation();colorDropdown.classList.contains("hidden")?openColorPicker():closeColorPicker()});
+document.addEventListener("click",function(e){if(!e.target.closest(".color-btn-wrap"))closeColorPicker()});
+function updateColorIndicator(color){const line=colorBtn.querySelector("line");if(line)line.setAttribute("stroke",color)}
+// Add color from input
+document.querySelector(".color-add-btn")?.addEventListener("click",function(e){e.stopPropagation();const input=document.createElement("input");input.type="color";input.value="#1e293b";input.addEventListener("input",function(){document.execCommand("foreColor",false,this.value);noteEditor.focus()});input.addEventListener("change",function(){document.execCommand("foreColor",false,this.value);noteEditor.focus();closeColorPicker();updateColorIndicator(this.value)});input.click()});
+// Eyedropper
+document.querySelector(".color-eyedropper-btn")?.addEventListener("click",async function(e){e.stopPropagation();try{if(!window.EyeDropper){showMessage("Tu navegador no soporta el cuentagotas","error");return}const dropper=new EyeDropper();const result=await dropper.open();document.execCommand("foreColor",false,result.sRGBHex);noteEditor.focus();closeColorPicker();updateColorIndicator(result.sRGBHex)}catch(err){}});
+
+// View switching
+const views=["inboxView","notesView","proximosView","proyectosView"];
+const viewTitles={inboxView:"Bandeja de entrada",notesView:"Mis Notas",proyectosView:"Proyectos",proximosView:"Próximo"};
+const viewIcons={inboxView:"inbox",notesView:"today",proyectosView:"folder",proximosView:"event_upcoming"};
+const viewIds={inboxView:0,notesView:1,proyectosView:2,proximosView:3};
+function switchView(id){
+  const viewName=views[id];
+  document.querySelectorAll(".view-section").forEach(v=>v.classList.remove("active"));
+  document.getElementById(viewName).classList.add("active");
+  document.querySelectorAll("nav a").forEach((x,i)=>{
+    x.className=i===id?"flex items-center gap-3 px-4 py-3 text-primary border-l-4 border-primary bg-primary/10 rounded-xl transition-all duration-200 translate-x-1 cursor-default":"flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-glass-surface/50 rounded-xl transition-all duration-200 cursor-default"
+  });
+  const titleEl=document.querySelector("#mainContent .view-section.active h2");
+  if(titleEl)titleEl.textContent=viewTitles[viewName];
+}
+document.querySelectorAll("nav a").forEach((a,i)=>{a.addEventListener("click",()=>switchView(i))});
+
+// Projects (localStorage)
+let projects=JSON.parse(localStorage.getItem("neat_projects")||"[]");
+function saveProjects(){localStorage.setItem("neat_projects",JSON.stringify(projects))}
+function renderProjects(){
+  const grid=document.getElementById("projectsGrid");grid.innerHTML="";
+  if(projects.length===0){grid.innerHTML='<div class="col-span-full text-center py-12 text-slate-400"><span class="material-symbols-outlined text-5xl mb-3">folder_off</span><p>No hay proyectos todavía</p></div>';return}
+  projects.forEach((p,i)=>{
+    const c=document.createElement("div");c.className="glass-card p-5 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group";
+    const notesInProject=notes.filter(n=>p.notes?.includes(n.id));
+    c.innerHTML=`<div class="flex items-start gap-3"><span class="material-symbols-outlined text-primary text-3xl">folder</span><div class="flex-1 min-w-0"><h3 class="font-semibold text-slate-800 truncate">${p.name}</h3><p class="text-xs text-slate-400 mt-0.5">${notesInProject.length} nota(s)</p><p class="text-xs text-slate-300 mt-0.5">${new Date(p.created).toLocaleDateString("es-ES")}</p></div></div><div class="mt-3 flex flex-wrap gap-1.5">${notesInProject.slice(0,3).map(n=>`<span class="text-xs px-2 py-0.5 bg-slate-100 rounded-md truncate max-w-[100px]">${n.title}</span>`).join("")}</div>`;
+    grid.appendChild(c)
+  })
+}
+function openProjectModal(){document.getElementById("projectModalOverlay").classList.add("active");document.getElementById("projectModal").classList.add("active");document.getElementById("projectNameInput").value="";document.getElementById("projectNameInput").focus()}
+function closeProjectModal(){document.getElementById("projectModalOverlay").classList.remove("active");document.getElementById("projectModal").classList.remove("active")}
+document.getElementById("projectModalCreate").addEventListener("click",function(){const name=document.getElementById("projectNameInput").value.trim();if(!name){showMessage("Escribe un nombre","error");return}projects.push({id:Date.now(),name,notes:[],created:new Date().toISOString()});saveProjects();renderProjects();closeProjectModal();showMessage(`Proyecto "${name}" creado`,"success");addNotification("Proyecto creado: "+name,"success")});
+document.getElementById("projectModalCancel").addEventListener("click",closeProjectModal);
+document.getElementById("projectModalOverlay").addEventListener("click",closeProjectModal);
+document.getElementById("newProjectBtn")?.addEventListener("click",openProjectModal);
+document.getElementById("newProjectFromView")?.addEventListener("click",openProjectModal);
+document.getElementById("projectNameInput").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("projectModalCreate").click()});
+
+// Calendar
+let calDate=new Date();
+function renderCalendar(){
+  const year=calDate.getFullYear(),month=calDate.getMonth();
+  document.getElementById("calMonth").textContent=new Date(year,month).toLocaleDateString("es-ES",{month:"long",year:"numeric"});
+  const days=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  document.getElementById("calHeader").innerHTML=days.map(d=>`<th class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1 py-1">${d}</th>`).join("");
+  const firstDay=new Date(year,month,1).getDay(),daysInMonth=new Date(year,month+1,0).getDate();
+  const prevDays=new Date(year,month,0).getDate();
+  let html="",day=1,nextDay=1;
+  const selectedDate=window._calSelectedDate||"";
+  for(let r=0;r<6;r++){
+    html+="<tr>";
+    for(let c=0;c<7;c++){
+      if(r===0&&c<firstDay){html+=`<td class="other-month"><span class="day-num">${prevDays-firstDay+c+1}</span></td>`}
+      else if(day>daysInMonth){html+=`<td class="other-month"><span class="day-num">${nextDay++}</span></td>`}
+      else{const dateStr=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;const isToday=dateStr===new Date().toISOString().slice(0,10);const calData=JSON.parse(localStorage.getItem("neat_calendar")||"{}");const hasNotes=calData[dateStr]?.length;const isSelected=dateStr===selectedDate;html+=`<td class="${isToday?"today":""} ${isSelected?"selected":""}" data-date="${dateStr}" onclick="selectDay('${dateStr}')"><span class="day-num">${day}</span>${hasNotes?'<div class="day-dot"></div>':""}</td>`;day++}
     }
-  </script>
+    html+="</tr>";
+    if(day>daysInMonth&&nextDay>7)break;
+  }
+  document.getElementById("calBody").innerHTML=html;
+}
+document.getElementById("calPrev").addEventListener("click",function(){calDate.setMonth(calDate.getMonth()-1);renderCalendar()});
+document.getElementById("calNext").addEventListener("click",function(){calDate.setMonth(calDate.getMonth()+1);renderCalendar()});
+function selectDay(dateStr){
+  window._calSelectedDate=dateStr;
+  renderCalendar();
+  let calData=JSON.parse(localStorage.getItem("neat_calendar")||"{}");
+  const dayNotes=calData[dateStr]||[];
+  const panel=document.getElementById("dayNotesPanel");
+  const formattedDate=new Date(dateStr+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  if(dayNotes.length===0){
+    panel.innerHTML=`<div class="glass-card rounded-2xl p-5">
+      <div class="text-center mb-4">
+        <span class="material-symbols-outlined text-2xl text-slate-300">event</span>
+        <p class="text-sm font-semibold text-slate-600 mt-1 capitalize">${formattedDate}</p>
+        <p class="text-xs text-slate-400 mt-0.5">Sin notas para este día</p>
+      </div>
+      <div class="flex gap-2">
+        <input id="calNoteInput" class="flex-1 px-4 py-2.5 bg-white/60 border border-glass-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" placeholder="Escribe una nota..." type="text"/>
+        <button onclick="addNoteToDay('${dateStr}')" class="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:-translate-y-0.5 active:scale-95 transition-all shrink-0">Agregar</button>
+      </div>
+    </div>`;
+    const input=document.getElementById("calNoteInput");
+    input.focus();
+    input.addEventListener("keydown",function(e){if(e.key==="Enter")addNoteToDay(dateStr)});
+    return
+  }
+  panel.innerHTML=`<div class="glass-card rounded-2xl p-5">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <p class="text-sm font-semibold text-slate-700 capitalize">${formattedDate}</p>
+        <p class="text-xs text-slate-400">${dayNotes.length} nota${dayNotes.length!==1?"s":""}</p>
+      </div>
+      <button onclick="addNoteToDay('${dateStr}')" class="w-9 h-9 flex items-center justify-center bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-all active:scale-90"><span class="material-symbols-outlined text-lg">add</span></button>
+    </div>
+    <div class="space-y-1.5">${dayNotes.map((n,i)=>`<div class="flex items-center justify-between gap-2 p-2.5 bg-white/40 rounded-xl border border-glass-border group">
+      <span class="text-sm text-slate-700 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0"></span>${n}</span>
+      <button onclick="removeCalNote('${dateStr}',${i})" class="text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"><span class="material-symbols-outlined text-sm">close</span></button>
+    </div>`).join("")}</div>
+    <div class="mt-3 flex gap-2">
+      <input id="calNoteInput" class="flex-1 px-4 py-2.5 bg-white/60 border border-glass-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" placeholder="Agregar nota..." type="text"/>
+      <button onclick="addNoteToDay('${dateStr}')" class="px-4 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:-translate-y-0.5 active:scale-95 transition-all shrink-0">+</button>
+    </div>
+  </div>`;
+  const input=document.getElementById("calNoteInput");
+  input.addEventListener("keydown",function(e){if(e.key==="Enter")addNoteToDay(dateStr)});
+}
+function addNoteToDay(dateStr){
+  const input=document.getElementById("calNoteInput");
+  const title=input?input.value.trim():"";
+  if(!title)return;
+  let calData=JSON.parse(localStorage.getItem("neat_calendar")||"{}");
+  if(!calData[dateStr])calData[dateStr]=[];
+  calData[dateStr].push(title);
+  localStorage.setItem("neat_calendar",JSON.stringify(calData));
+  selectDay(dateStr);
+  renderCalendar();
+  addNotification("Nota agregada al calendario: "+title,"success");
+}
+function removeCalNote(dateStr,i){
+  let calData=JSON.parse(localStorage.getItem("neat_calendar")||"{}");
+  if(!calData[dateStr])return;
+  calData[dateStr].splice(i,1);
+  if(calData[dateStr].length===0)delete calData[dateStr];
+  localStorage.setItem("neat_calendar",JSON.stringify(calData));
+  selectDay(dateStr);
+  renderCalendar();
+}
+
+// Inbox dashboard
+function renderInbox(){
+  const total=notes.length;
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+  const recent=notes.filter(n=>new Date(n.updated_at)>weekAgo).length;
+  document.getElementById("statTotalNotes").textContent=total;
+  document.getElementById("statRecentNotes").textContent=recent;
+  document.getElementById("statProjects").textContent=projects.length;
+  const recentList=document.getElementById("recentNotesList");
+  const recent5=notes.slice(0,5);
+  if(recent5.length===0){recentList.innerHTML='<p class="text-sm text-slate-400">No hay notas aún</p>';return}
+  recentList.innerHTML=recent5.map(n=>`<div class="flex items-center justify-between p-2 hover:bg-slate-50 rounded-lg cursor-pointer transition-all recent-note" data-id="${n.id}"><span class="text-sm font-medium text-slate-700 truncate">${n.title}</span><span class="text-xs text-slate-400 shrink-0">${formatDate(n.updated_at)}</span></div>`).join("");
+  recentList.querySelectorAll(".recent-note").forEach(el=>el.addEventListener("click",function(){const id=parseInt(this.dataset.id);const note=notes.find(n=>n.id===id);if(note)openEditor(note)}));
+  const lastP=projects.length?projects[projects.length-1]:null;document.getElementById("lastProjectInfo").innerHTML=lastP?'<span class="text-slate-700">'+lastP.name+'</span><span class="text-xs text-slate-400 ml-2">'+new Date(lastP.created).toLocaleDateString("es-ES",{day:"numeric",month:"short"})+'</span>':'<span class="text-slate-400">Ninguno</span>';
+}
+
+// Override loadNotes
+async function loadNotes(){try{notes=await apiRequest("/notes");renderNotes();renderProjects();renderInbox();renderCalendar()}catch(error){notesCount&&(notesCount.textContent="Error al cargar");showMessage(error.message,"error")}}
+
+newNoteButton.addEventListener("click",()=>openEditor(null));
+addTaskBtn.addEventListener("click",()=>openEditor(null));
+logoutButton.addEventListener("click",()=>{removeToken();window.location.href="login.html"});
+
+// Settings
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsModal = document.getElementById("settingsModal");
+const settingsOverlay = document.getElementById("settingsOverlay");
+const closeSettingsBtn = document.getElementById("closeSettings");
+const settingsForm = document.getElementById("settingsForm");
+const settingsName = document.getElementById("settingsName");
+const settingsAvatarUpload = document.getElementById("settingsAvatarUpload");
+const settingsAvatarInput = document.getElementById("settingsAvatarInput");
+const settingsAvatarPreview = document.getElementById("settingsAvatarPreview");
+const settingsMessage = document.getElementById("settingsMessage");
+
+function openSettings() {
+  const p = getUser();
+  settingsName.value = p?.name || "";
+  const checkedRadio = document.querySelector(`input[name="settingsUserType"][value="${p?.userType || "personal"}"]`);
+  if (checkedRadio) checkedRadio.checked = true;
+  if (p?.avatar && p.avatar.startsWith("data:")) settingsAvatarPreview.src = p.avatar;
+  settingsModal.classList.add("active");
+  settingsOverlay.classList.add("active");
+}
+
+function closeSettings() {
+  settingsModal.classList.remove("active");
+  settingsOverlay.classList.remove("active");
+  settingsMessage.textContent = "";
+}
+
+settingsBtn.addEventListener("click", openSettings);
+closeSettingsBtn.addEventListener("click", closeSettings);
+settingsOverlay.addEventListener("click", closeSettings);
+
+settingsAvatarUpload.addEventListener("click", () => settingsAvatarInput.click());
+settingsAvatarInput.addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => { settingsAvatarPreview.src = ev.target.result; };
+    reader.readAsDataURL(file);
+  }
+});
+
+settingsForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = settingsName.value.trim();
+  const userType = document.querySelector('input[name="settingsUserType"]:checked');
+  if (!name) { settingsMessage.textContent = "El nombre es obligatorio"; settingsMessage.className = "text-sm text-center text-error"; return; }
+  if (!userType) { settingsMessage.textContent = "Selecciona un tipo de usuario"; settingsMessage.className = "text-sm text-center text-error"; return; }
+  const p = getUser() || {};
+  saveUser({ ...p, name, userType: userType.value, avatar: settingsAvatarPreview.src, onboardingComplete: true });
+  document.getElementById("sidebarUserName").textContent = name;
+  const avatarImg = document.getElementById("avatarImg");
+  const avatarInitial = document.getElementById("avatarInitial");
+  if (settingsAvatarPreview.src.startsWith("data:")) {
+    avatarImg.src = settingsAvatarPreview.src;
+    avatarImg.classList.remove("hidden");
+    avatarInitial.classList.add("hidden");
+  }
+  settingsMessage.textContent = "Cambios guardados";
+  settingsMessage.className = "text-sm text-center text-primary";
+  setTimeout(closeSettings, 800);
+});
+
+// Notifications
+const alertsBtn = document.getElementById("alertsBtn");
+const notifPanel = document.getElementById("notifPanel");
+const notifOverlay = document.getElementById("notifOverlay");
+const notifList = document.getElementById("notifList");
+const clearNotifBtn = document.getElementById("clearNotifBtn");
+
+function getNotifications() {
+  try { return JSON.parse(localStorage.getItem("neat_notifications") || "[]"); } catch { return []; }
+}
+function saveNotifications(list) {
+  localStorage.setItem("neat_notifications", JSON.stringify(list));
+}
+function renderNotifications() {
+  const list = getNotifications();
+  if (list.length === 0) {
+    notifList.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No hay alertas nuevas</p>';
+  } else {
+    notifList.innerHTML = list.map((n, i) =>
+      `<div class="flex items-start gap-3 p-3 bg-white/40 rounded-xl border border-glass-border">
+        <span class="material-symbols-outlined text-sm mt-0.5 ${n.type === "success" ? "text-emerald-500" : n.type === "error" ? "text-red-500" : "text-primary"}">${n.type === "success" ? "check_circle" : n.type === "error" ? "error" : "info"}</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-slate-700">${n.text}</p>
+          <p class="text-xs text-slate-400 mt-0.5">${n.time || ""}</p>
+        </div>
+        <button onclick="removeNotif(${i})" class="text-slate-300 hover:text-slate-500 transition-colors"><span class="material-symbols-outlined text-sm">close</span></button>
+      </div>`
+    ).join("");
+  }
+}
+window.removeNotif = function (i) {
+  const list = getNotifications();
+  list.splice(i, 1);
+  saveNotifications(list);
+  renderNotifications();
+  if (list.length === 0) closeNotifPanel();
+};
+function openNotifPanel() {
+  renderNotifications();
+  notifPanel.classList.add("active");
+  notifOverlay.classList.add("active");
+}
+function closeNotifPanel() {
+  notifPanel.classList.remove("active");
+  notifOverlay.classList.remove("active");
+}
+alertsBtn.addEventListener("click", () => {
+  if (notifPanel.classList.contains("active")) closeNotifPanel();
+  else openNotifPanel();
+});
+notifOverlay.addEventListener("click", closeNotifPanel);
+clearNotifBtn.addEventListener("click", () => {
+  saveNotifications([]);
+  renderNotifications();
+  closeNotifPanel();
+});
+
+function addNotification(text, type = "info") {
+  const list = getNotifications();
+  list.unshift({ text, type, time: new Date().toLocaleDateString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) });
+  if (list.length > 20) list.length = 20;
+  saveNotifications(list);
+}
+
+// Share modal
+const shareModal=document.getElementById("shareModal");
+const shareOverlay=document.getElementById("shareOverlay");
+const closeShare=document.getElementById("closeShare");
+const shareLinkInput=document.getElementById("shareLinkInput");
+const copyShareLink=document.getElementById("copyShareLink");
+const shareNoteTitle=document.getElementById("shareNoteTitle");
+let _shareNoteId=null;
+
+function openShareModal(note){
+  _shareNoteId=note.id;
+  shareNoteTitle.textContent=note.title;
+  const link=`${window.location.origin}${window.location.pathname.replace(/[^/]*$/,"")}collab.html?id=${note.id}&token=${getToken()}`;
+  shareLinkInput.value=link;
+  shareModal.classList.add("active");
+  shareOverlay.classList.add("active");
+}
+function closeShareModal(){
+  shareModal.classList.remove("active");
+  shareOverlay.classList.remove("active");
+}
+closeShare.addEventListener("click",closeShareModal);
+shareOverlay.addEventListener("click",closeShareModal);
+copyShareLink.addEventListener("click",()=>{
+  shareLinkInput.select();
+  navigator.clipboard.writeText(shareLinkInput.value).then(()=>{showMessage("Enlace copiado","success")}).catch(()=>{});
+});
+
+closeModal.addEventListener("click",closeEditor);
+modalOverlay.addEventListener("click",closeEditor);
+
+fullscreenNoteBtn.addEventListener("click",()=>{
+  if(!selectedNoteId)return;
+  const note=notes.find(n=>n.id===selectedNoteId);
+  if(!note)return;
+  const win=window.open("","_blank");
+  if(!win){showMessage("El navegador bloqueó la ventana","error");return}
+  const user=getUser()||{name:"Usuario"};
+  const initial=(user.name||"U")[0].toUpperCase();
+  const colors=JSON.stringify([
+    ["#000000","#1f2937","#374151","#4b5563","#6b7280","#9ca3af","#d1d5db","#e5e7eb","#f3f4f6","#ffffff"],
+    ["#7f1d1d","#dc2626","#ea580c","#f59e0b","#84cc16","#10b981","#14b8a6","#06b6d4","#3b82f6","#8b5cf6"],
+    ["#fca5a5","#fbbf24","#fde68a","#d9f99d","#a7f3d0","#99f6e4","#a5f3fc","#93c5fd","#c4b5fd","#f9a8d4"],
+    ["#f87171","#f59e0b","#fcd34d","#bef264","#6ee7b7","#5eead4","#67e8f9","#60a5fa","#a78bfa","#f472b6"],
+    ["#ef4444","#d97706","#fbbf24","#a3e635","#34d399","#2dd4bf","#22d3ee","#3b82f6","#8b5cf6","#ec4899"],
+    ["#dc2626","#b45309","#f59e0b","#84cc16","#10b981","#14b8a6","#06b6d4","#2563eb","#7c3aed","#db2777"],
+    ["#b91c1c","#92400e","#d97706","#65a30d","#059669","#0d9488","#0891b2","#1d4ed8","#6d28d9","#be185d"],
+    ["#991b1b","#78350f","#b45309","#4d7c0f","#047857","#0f766e","#0e7490","#1e40af","#5b21b6","#9d174d"]
+  ]);
+  win.document.write(`<!DOCTYPE html><html class="light" lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${note.title} | Neat!</title><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"><\/script><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/><script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#005ab6","on-primary":"#ffffff","primary-container":"#0072e4","secondary":"#6700bf","tertiary":"#9b4000","surface":"#f7f9fb","surface-dim":"#d8dadc","on-surface":"#191c1e","on-surface-variant":"#414754","outline":"#717786","outline-variant":"#c1c6d7","text-primary":"#0F172A","text-secondary":"#64748B","glass-border":"rgba(255,255,255,0.20)","accent-pink":"#F472B6","gradient-start":"#0080FF","gradient-end":"#8B00FF"},borderRadius:{DEFAULT:"1rem",lg:"2rem",xl:"3rem",full:"9999px"},fontFamily:{sans:["Inter","system-ui","sans-serif"]},fontSize:{"display-hero":["96px",{lineHeight:"104px",letterSpacing:"-0.04em",fontWeight:"700"}],"body-md":["16px",{lineHeight:"24px",fontWeight:"400"}],"label-sm":["13px",{lineHeight:"16px",letterSpacing:"0.05em",fontWeight:"600"}],"headline-lg":["48px",{lineHeight:"56px",letterSpacing:"-0.02em",fontWeight:"700"}],"body-xl":["20px",{lineHeight:"32px",fontWeight:"300"}]}}}}<\/script><style>body{font-family:Inter,sans-serif;background-color:#F8FAFC;overflow-x:hidden}.glass-panel{backdrop-filter:blur(40px);background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2)}.canvas-shadow{box-shadow:0 4px 60px -12px rgba(0,80,255,0.08)}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24}.radial-glow{position:fixed;width:800px;height:800px;border-radius:50%;filter:blur(120px);opacity:0.15;z-index:-1;pointer-events:none}.glow-1{top:-200px;right:-200px;background:radial-gradient(circle,#0080FF,transparent)}.glow-2{bottom:-200px;left:-200px;background:radial-gradient(circle,#8B00FF,transparent)}.toolbar-container{display:flex;align-items:center;gap:6px;padding:10px 16px;background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 4px 20px rgba(15,23,42,0.06)}.toolbar-divider{width:1px;height:24px;background:rgba(0,0,0,0.08)}.toolbar-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#64748b;transition:all 120ms;cursor:pointer}.toolbar-btn:hover{background:rgba(15,23,42,0.05);color:#0f172a}.toolbar-btn.active{background:rgba(37,99,235,0.12);color:#2563EB}.toolbar-btn:active{transform:scale(0.96)}#noteEditor:focus{outline:none}#noteEditor h1{font-size:2rem;font-weight:700;margin:1rem 0 .5rem;color:#0F172A}#noteEditor h2{font-size:1.5rem;font-weight:600;margin:.8rem 0 .4rem;color:#0F172A}#noteEditor h3{font-size:1.25rem;font-weight:600;margin:.6rem 0 .3rem;color:#0F172A}#noteEditor ul,#noteEditor ol{padding-left:1.5rem;margin:.5rem 0}#noteEditor p{margin-bottom:.75rem}#noteEditor a{color:#005ab6;text-decoration:underline}.color-dropdown{position:absolute;top:calc(100%+8px);right:50%;transform:translateX(50%);z-index:200;background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 12px 40px rgba(15,23,42,0.12);padding:10px;width:240px;display:none}.color-dropdown.open{display:block}.color-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}.color-swatch{width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid transparent;cursor:pointer;transition:transform 120ms,box-shadow 120ms;padding:0}.color-swatch:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,0.15)}.color-swatch.selected{border-color:#2563EB;box-shadow:0 0 0 2px #fff,0 0 0 4px #2563EB;transform:scale(1)}.color-swatch[data-color="#ffffff"]{border-color:#d1d5db}.color-custom-section{border-top:1px solid rgba(0,0,0,0.06);padding-top:8px;display:flex;flex-direction:column;gap:6px}.color-custom-title{font-size:11px;font-weight:600;color:#64748b;letter-spacing:0.05em}.color-custom-row{display:flex;align-items:center;gap:6px}.color-custom-row .color-swatch{width:28px;height:28px}.color-add-btn,.color-eyedropper-btn{width:28px;height:28px;border-radius:50%;border:1px dashed #d1d5db;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#64748b;transition:all 120ms}.color-add-btn:hover,.color-eyedropper-btn:hover{background:rgba(15,23,42,0.05);color:#1e293b}.heading-option.active{background:rgba(0,90,182,0.08);color:#005ab6;font-weight:600}<\/style><\/head><body class="min-h-screen text-on-surface"><div class="radial-glow glow-1"></div><div class="radial-glow glow-2"></div><header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/20 shadow-sm shadow-primary/5"><div class="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between"><div class="flex items-center gap-8"><span class="text-body-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Neat!</span><div class="flex flex-col"><div class="flex items-center gap-2"><h1 class="text-sm font-semibold text-[#0F172A]">${note.title}</h1><span class="material-symbols-outlined text-[#c1c6d7] text-[18px]">star</span></div><div class="flex gap-4 items-center mt-0.5"><nav class="flex gap-4"><span class="text-xs text-[#717786] font-medium hover:text-[#005ab6] transition-colors cursor-pointer">File</span><span class="text-xs text-[#717786] font-medium hover:text-[#005ab6] transition-colors cursor-pointer">Edit</span><span class="text-xs text-[#717786] font-medium hover:text-[#005ab6] transition-colors cursor-pointer">Insert</span><span class="text-xs text-[#717786] font-medium hover:text-[#005ab6] transition-colors cursor-pointer">Format</span><span class="text-xs text-[#717786] font-medium hover:text-[#005ab6] transition-colors cursor-pointer">Tools</span></nav><span class="h-3 w-px bg-[#c1c6d7]"></span><span class="text-[10px] text-[#c1c6d7] uppercase tracking-wider font-bold" id="collabStatus">Connecting...</span></div></div></div><div class="flex items-center gap-4"><div class="flex items-center -space-x-2 mr-4"><div class="w-8 h-8 rounded-full border-2 border-white bg-[#005ab6] flex items-center justify-center text-[10px] font-bold text-white">${initial}</div></div><button class="material-symbols-outlined p-2 text-[#717786] hover:bg-black/5 rounded-full transition-all">history</button><button class="material-symbols-outlined p-2 text-[#717786] hover:bg-black/5 rounded-full transition-all">chat_bubble</button><button class="px-5 py-2 bg-gradient-to-r from-[#005ab6] to-[#6700bf] text-white rounded-full text-xs font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Share</button></div></div></header><main class="pt-32 pb-24 px-6"><div class="max-w-[850px] mx-auto"><article class="bg-white min-h-[1100px] rounded-[4px] canvas-shadow border border-slate-100 relative overflow-hidden"><div class="absolute top-8 right-12 text-[10px] text-slate-300 font-bold tracking-[0.2em] uppercase">Auto-saved / Cloud Sync</div><div class="sticky top-16 z-40 flex items-center justify-center py-4 px-6 bg-white/90 backdrop-blur-md border-b border-slate-100" id="toolbarWrap"><div class="toolbar-container flex items-center" id="toolbar"><div class="relative" id="headingDropdownWrap"><button id="headingSelectBtn" class="flex items-center gap-2 px-4 py-2 bg-[#f1f5f9] rounded-xl text-sm font-semibold text-slate-800 hover:bg-[#e2e8f0] transition-all active:scale-95" title="Estilo de texto"><span id="headingSelectLabel">Paragraph</span><span class="material-symbols-outlined text-base text-slate-400">expand_more</span></button><div id="headingDropdown" class="absolute top-full left-0 mt-1.5 bg-white rounded-2xl shadow-lg border border-[rgba(0,0,0,0.06)] p-1.5 min-w-[160px] z-50 opacity-0 pointer-events-none scale-95 transition-all duration-150" style="transform-origin:top left"><button data-value="p" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all active">Paragraph</button><button data-value="h1" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Heading 1</button><button data-value="h2" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Heading 2</button><button data-value="h3" class="heading-option w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-[#f1f5f9] hover:text-slate-900 transition-all">Heading 3</button></div></div><div class="toolbar-divider"></div><button data-cmd="bold" class="toolbar-btn" title="Bold (Ctrl+B)"><b style="font-size:15px;font-weight:800">B</b></button><button data-cmd="italic" class="toolbar-btn" title="Italic (Ctrl+I)"><span style="font-size:16px">I</span></button><button data-cmd="underline" class="toolbar-btn" title="Underline (Ctrl+U)"><u style="font-size:15px;text-decoration:underline">U</u></button><div class="toolbar-divider"></div><button data-cmd="insertUnorderedList" class="toolbar-btn" title="Lista"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg></button><button data-cmd="insertOrderedList" class="toolbar-btn" title="Lista numerada"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="5" x2="21" y2="5"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="19" x2="21" y2="19"/><text x="3" y="7" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">1</text><text x="3" y="14" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">2</text><text x="3" y="21" font-size="5" font-weight="400" font-family="Arial,sans-serif" fill="currentColor">3</text></svg></button><div class="toolbar-divider"></div><button data-cmd="justifyLeft" class="toolbar-btn" title="Align left"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="5" x2="20" y2="5"/><line x1="4" y1="10" x2="15" y2="10"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="4" y1="20" x2="13" y2="20"/></svg></button><button data-cmd="justifyCenter" class="toolbar-btn" title="Center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="5"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="9" y1="20" x2="15" y2="20"/></svg></button><button data-cmd="justifyRight" class="toolbar-btn" title="Align right"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="5" x2="20" y2="5"/><line x1="9" y1="10" x2="20" y2="10"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="11" y1="20" x2="20" y2="20"/></svg></button><div class="toolbar-divider"></div><div class="color-btn-wrap relative"><button id="colorBtn" class="toolbar-btn" title="Text color"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><text x="5" y="16" font-size="12" font-weight="700" font-family="Inter,sans-serif">A</text><line x1="3" y1="19" x2="15" y2="19" stroke="#2563EB" stroke-width="2.5"/></svg></button><div id="colorDropdown" class="color-dropdown"><div class="color-grid" id="colorGrid"></div><div class="color-custom-section"><span class="color-custom-title">CUSTOM</span><div class="color-custom-row"><div class="color-swatch selected" style="background:#1e293b" data-color="#1e293b"></div><div class="color-swatch" style="background:#475569" data-color="#475569"></div><button class="color-add-btn" title="Add color">+</button><button class="color-eyedropper-btn" title="Eyedropper"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22l3-3 1 1z"/><path d="M8 16l4-4"/><path d="M14 10l-2-2"/><path d="M16.5 2.5a2.121 2.121 0 0 1 3 3L12 13l-3-3 7.5-7.5z"/><path d="M12 13l-3-3"/></svg></button></div></div></div></div><div class="toolbar-divider"></div><button data-cmd="outdent" class="toolbar-btn" title="Outdent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="5" x2="21" y2="5"/><line x1="13" y1="10" x2="21" y2="10"/><line x1="13" y1="15" x2="21" y2="15"/><line x1="13" y1="20" x2="21" y2="20"/><polyline points="9,16 5,12 9,8"/></svg></button><button data-cmd="indent" class="toolbar-btn" title="Indent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="5" x2="21" y2="5"/><line x1="13" y1="10" x2="21" y2="10"/><line x1="13" y1="15" x2="21" y2="15"/><line x1="13" y1="20" x2="21" y2="20"/><polyline points="5,16 9,12 5,8"/></svg></button></div></div><div class="p-8 md:p-16 lg:p-24"><div id="noteEditor" class="text-lg leading-relaxed text-slate-700 min-h-[800px]" contenteditable="true">${note.content}</div></div></article></div></main><script src="https://cdn.jsdelivr.net/npm/yjs@13.6.18/dist/y.min.js"><\/script><script src="https://cdn.jsdelivr.net/npm/y-webrtc@10.4.0/dist/y-webrtc.min.js"><\/script><script>const ydoc=new Y.Doc();const ytext=ydoc.getText("content");const provider=new Y.WebRTC(ydoc,{room:"note-${note.id}",signaling:["wss://y-webrtc-signaling.onrender.com"],maxBackoffTime:5e3});const editor=document.getElementById("noteEditor");let isRemote=false;provider.on("synced",()=>{document.getElementById("collabStatus").textContent="Saved to cloud"});ytext.observe(()=>{if(!isRemote&&ytext.toString()){isRemote=true;editor.innerHTML=ytext.toString();isRemote=false}});editor.addEventListener("input",()=>{if(isRemote)return;isRemote=true;ytext.delete(0,ytext.length);ytext.insert(0,editor.innerHTML);isRemote=false});const headingBtn=document.getElementById("headingSelectBtn");const headingLabel=document.getElementById("headingSelectLabel");const headingDropdown=document.getElementById("headingDropdown");document.querySelectorAll(".heading-option").forEach(o=>{o.addEventListener("click",()=>{document.execCommand("formatBlock",false,o.dataset.value);headingLabel.textContent=o.textContent.trim();document.querySelectorAll(".heading-option").forEach(h=>h.classList.remove("active"));o.classList.add("active");headingDropdown.classList.remove("active","scale-95");editor.focus()})});headingBtn.addEventListener("click",(e)=>{e.stopPropagation();headingDropdown.classList.toggle("active");headingDropdown.classList.toggle("scale-95")});document.addEventListener("click",(e)=>{if(!e.target.closest("#headingDropdownWrap")){headingDropdown.classList.remove("active");headingDropdown.classList.add("scale-95")}});document.querySelectorAll(".toolbar-btn[data-cmd]").forEach(btn=>{btn.addEventListener("click",function(){const cmd=this.dataset.cmd;const val=this.dataset.val||null;if(cmd==="formatBlock"&&val){document.execCommand("formatBlock",false,val)}else{document.execCommand(cmd,false,val)}editor.focus()})});editor.addEventListener("mouseup",updateToolbar);editor.addEventListener("keyup",updateToolbar);function updateToolbar(){["bold","italic","underline","insertUnorderedList","insertOrderedList","justifyLeft","justifyCenter","justifyRight"].forEach(cmd=>{const active=document.queryCommandState(cmd);document.querySelectorAll('[data-cmd="'+cmd+'"]').forEach(b=>b.classList.toggle("active",active))});const sel=window.getSelection();const p=sel?.focusNode?.parentElement;if(p){const h=p.closest("h1,h2,h3,p,div");const tag=h?.tagName?.toLowerCase();if(["h1","h2","h3","p"].includes(tag)){const map={h1:"Heading 1",h2:"Heading 2",h3:"Heading 3",p:"Paragraph"};headingLabel.textContent=map[tag];document.querySelectorAll(".heading-option").forEach(o=>o.classList.toggle("active",o.dataset.value===tag))}}}const COLORS=${colors};const colorGrid=document.getElementById("colorGrid");COLORS.forEach(row=>{row.forEach(c=>{const s=document.createElement("button");s.className="color-swatch";s.style.background=c;s.dataset.color=c;if(c==="#ffffff")s.style.borderColor="#d1d5db";s.addEventListener("click",function(e){e.stopPropagation();document.execCommand("foreColor",false,this.dataset.color);editor.focus();closeColorPicker();updateColorIndicator(this.dataset.color)});colorGrid.appendChild(s)})});const colorBtn=document.getElementById("colorBtn");const colorDropdown=document.getElementById("colorDropdown");function closeColorPicker(){colorDropdown.classList.remove("open")}function openColorPicker(){colorDropdown.classList.add("open")}colorBtn.addEventListener("click",function(e){e.stopPropagation();colorDropdown.classList.contains("open")?closeColorPicker():openColorPicker()});document.addEventListener("click",function(e){if(!e.target.closest(".color-btn-wrap"))closeColorPicker()});function updateColorIndicator(color){const line=colorBtn.querySelector("line");if(line)line.setAttribute("stroke",color)}document.querySelector(".color-add-btn")?.addEventListener("click",function(e){e.stopPropagation();const input=document.createElement("input");input.type="color";input.value="#1e293b";input.addEventListener("input",function(){document.execCommand("foreColor",false,this.value);editor.focus()});input.addEventListener("change",function(){document.execCommand("foreColor",false,this.value);editor.focus();closeColorPicker();updateColorIndicator(this.value)});input.click()});document.querySelector(".color-eyedropper-btn")?.addEventListener("click",async function(e){e.stopPropagation();try{if(!window.EyeDropper)return;const dropper=new EyeDropper();const result=await dropper.open();document.execCommand("foreColor",false,result.sRGBHex);editor.focus();closeColorPicker();updateColorIndicator(result.sRGBHex)}catch(err){}});document.addEventListener('mousemove',(e)=>{const x=e.clientX/window.innerWidth;const y=e.clientY/window.innerHeight;document.querySelector('.glow-1').style.transform='translate('+(x*50)+'px,'+(y*50)+'px)';document.querySelector('.glow-2').style.transform='translate('+(-x*50)+'px,'+(-y*50)+'px)'});const article=document.querySelector('article');article.addEventListener('mouseenter',()=>{article.style.transform='translateY(-4px)';article.style.transition='transform 0.5s cubic-bezier(0.2,0,0,1)'});article.addEventListener('mouseleave',()=>{article.style.transform='translateY(0px)'});<\/script></body></html>`);
+  win.document.close();
+});
+
+document.addEventListener("keydown",(e)=>{if(e.key==="Escape"&&modalPanel.classList.contains("active"))closeEditor();if((e.ctrlKey||e.metaKey)&&e.key==="s"&&modalPanel.classList.contains("active")){e.preventDefault();saveNote()}});
+
+searchInput.addEventListener("input",()=>{searchQuery=searchInput.value;renderNotes()});
+
+const orb=document.getElementById("glow-orb");document.addEventListener("mousemove",(e)=>{const x=e.clientX-250;const y=e.clientY-250;orb.style.transform=`translate(${x}px,${y}px)`});
+
+// Init inbox view active by default
+switchView(0);
+if(!protectDashboard())throw new Error();
+const profile = getUser();
+if (!profile || !profile.onboardingComplete) {
+  window.location.href = "onboarding.html";
+} else {
+  const avatarImg = document.getElementById("avatarImg");
+  const avatarInitial = document.getElementById("avatarInitial");
+  document.getElementById("sidebarUserName").textContent = profile.name || "";
+  if (profile.avatar && profile.avatar.startsWith("data:")) {
+    avatarImg.src = profile.avatar;
+    avatarImg.classList.remove("hidden");
+    avatarInitial.classList.add("hidden");
+  } else {
+    avatarInitial.textContent = (profile.name || "U")[0].toUpperCase();
+  }
+}
+loadNotes()
+</script>
 </body>
 </html>

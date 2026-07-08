@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configurar Perfil | Neat!</title>
+<meta content="Completa tu perfil en Neat!" name="description"/>
+<meta content="Neat!" property="og:title"/>
+<meta content="website" property="og:type"/>
+<meta content="/public/logo.svg" rel="shortcut icon" type="image/svg+xml"/>
+<meta content="/public/logo.svg" rel="icon" type="image/svg+xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#005ab6","on-primary":"#ffffff","primary-container":"#0072e4","secondary":"#6700bf","tertiary":"#b40065","surface":"#f7f9fb","surface-dim":"#d8dadc","on-surface":"#191c1e","on-surface-variant":"#414754","outline":"#717786","outline-variant":"#c1c6d7","text-main":"#1E293B","text-muted":"#64748B","glass-surface":"rgba(255,255,255,0.15)","glass-border":"rgba(255,255,255,0.25)"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem","2xl":"1rem","3xl":"1.5rem"},fontFamily:{sans:["Inter","system-ui","sans-serif"],mono:["JetBrains Mono","monospace"]},fontSize:{"headline-lg":["36px",{lineHeight:"1.2",letterSpacing:"-0.01em",fontWeight:"700"}],"headline-md":["24px",{lineHeight:"1.3",fontWeight:"600"}],"body-md":["16px",{lineHeight:"1.6"}],"label-caps":["12px",{lineHeight:"1.2",letterSpacing:"0.05em",fontWeight:"600"}]}}}}
+</script>
+<style>
+.glass-panel{background:rgba(255,255,255,0.4);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.3);box-shadow:0 8px 32px 0 rgba(0,92,187,0.05)}
+.shimmer-button{position:relative;overflow:hidden}
+.shimmer-button::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(to bottom right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.13) 77%,rgba(255,255,255,0.5) 92%,rgba(255,255,255,0) 100%);transform:rotate(-45deg);transition:all 0.5s;opacity:0}
+.shimmer-button:hover::after{opacity:1;left:100%;top:100%}
+.input-glow:focus{box-shadow:0 0 0 2px rgba(0,90,182,0.1);border-color:#005ab6}
+.floating-blob{position:absolute;filter:blur(80px);z-index:-1;opacity:0.4;border-radius:50%;animation:drift 20s infinite alternate ease-in-out}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(100px,50px) scale(1.2)}}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+.avatar-upload{position:relative;width:120px;height:120px;margin:0 auto;cursor:pointer}
+.avatar-upload img{width:100%;height:100%;border-radius:1rem;object-fit:cover;border:3px solid rgba(255,255,255,0.5);box-shadow:0 4px 16px rgba(0,0,0,0.08);transition:all 0.3s}
+.avatar-upload:hover img{filter:brightness(0.8)}
+.avatar-upload .overlay{position:absolute;inset:0;border-radius:1rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;background:rgba(0,0,0,0.3)}
+.avatar-upload:hover .overlay{opacity:1}
+.avatar-upload .overlay span{color:white;font-size:32px}
+</style>
+</head>
+<body class="min-h-screen flex flex-col font-sans text-on-surface selection:bg-primary/10">
+<div class="fixed inset-0 overflow-hidden -z-10">
+<div class="floating-blob bg-primary w-[500px] h-[500px] -top-48 -left-24"></div>
+<div class="floating-blob bg-secondary w-[400px] h-[400px] top-1/2 -right-24" style="animation-delay:-5s"></div>
+<div class="floating-blob bg-tertiary w-[300px] h-[300px] -bottom-24 left-1/4" style="animation-delay:-10s"></div>
+</div>
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="w-full max-w-lg">
+<div class="flex flex-col items-center mb-8">
+<img src="/public/logo.png" alt="Neat!" class="w-16 h-16 mb-3 rounded-xl shadow-lg"/>
+<h1 class="text-headline-lg text-primary tracking-tight font-bold">Neat!</h1>
+<p class="text-body-md text-text-muted mt-1">Completa tu perfil</p>
+</div>
+<div class="glass-panel p-8 md:p-10 rounded-xl">
+<form id="onboardingForm" class="space-y-6">
+<div class="avatar-upload" id="avatarUpload">
+<img id="avatarPreview" src="/public/logo.png" alt="Foto de perfil"/>
+<div class="overlay"><span class="material-symbols-outlined">camera_alt</span></div>
+<input id="avatarInput" type="file" accept="image/*" class="hidden"/>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Nombre completo</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">person</span>
+<input id="onboardingName" name="name" class="w-full pl-12 pr-4 py-3 bg-white/20 border border-glass-border rounded-lg focus:outline-none input-glow transition-all placeholder:text-outline/60 text-on-surface" placeholder="Tu nombre" type="text" required/>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Tipo de usuario</label>
+<div class="grid grid-cols-3 gap-3">
+<label class="flex flex-col items-center gap-2 p-4 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary has-[:checked]:shadow-sm">
+<input type="radio" name="userType" value="estudiante" class="hidden"/>
+<span class="material-symbols-outlined text-3xl text-outline has-[:checked]:text-primary">school</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Estudiante</span>
+</label>
+<label class="flex flex-col items-center gap-2 p-4 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary has-[:checked]:shadow-sm">
+<input type="radio" name="userType" value="profesional" class="hidden"/>
+<span class="material-symbols-outlined text-3xl text-outline">work</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Profesional</span>
+</label>
+<label class="flex flex-col items-center gap-2 p-4 bg-white/20 border border-glass-border rounded-xl cursor-pointer hover:bg-white/30 transition-all has-[:checked]:bg-primary/10 has-[:checked]:border-primary has-[:checked]:shadow-sm">
+<input type="radio" name="userType" value="personal" class="hidden"/>
+<span class="material-symbols-outlined text-3xl text-outline">favorite</span>
+<span class="text-label-caps font-semibold text-on-surface-variant">Personal</span>
+</label>
+</div>
+</div>
+<button class="shimmer-button w-full bg-primary text-on-primary text-headline-md font-semibold py-4 rounded-lg shadow-sm hover:-translate-y-0.5 active:scale-95 transition-all duration-300" type="submit">Comenzar</button>
+<p id="message" class="text-center text-body-md mt-4" role="status"></p>
+</form>
+</div>
+</div>
+</main>
+<script src="js/api.js"></script>
+<script>
+const user = getUser();
+if (!user) {
+  window.location.href = "login.html";
+} else {
+  document.getElementById("onboardingName").value = user.name || "";
+}
+
+document.getElementById("avatarUpload").addEventListener("click", () => {
+  document.getElementById("avatarInput").click();
+});
+
+document.getElementById("avatarInput").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+      document.getElementById("avatarPreview").src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById("onboardingForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("onboardingName").value.trim();
+  const userType = document.querySelector('input[name="userType"]:checked');
+  const msg = document.getElementById("message");
+
+  if (!name) {
+    msg.textContent = "Por favor ingresa tu nombre";
+    msg.className = "text-center text-body-md mt-4 text-error";
+    return;
+  }
+  if (!userType) {
+    msg.textContent = "Selecciona un tipo de usuario";
+    msg.className = "text-center text-body-md mt-4 text-error";
+    return;
+  }
+
+  const avatarSrc = document.getElementById("avatarPreview").src;
+  const profile = {
+    name,
+    userType: userType.value,
+    avatar: avatarSrc,
+    onboardingComplete: true
+  };
+
+  saveUser({ ...user, ...profile });
+  msg.textContent = "¡Perfil configurado! Redirigiendo...";
+  msg.className = "text-center text-body-md mt-4 text-primary";
+
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 800);
+});
+</script>
+</body>
+</html>

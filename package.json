@@ -1,0 +1,14 @@
+{
+  "name": "noty",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm --prefix backend install && node -e \"const fs=require('fs'); if(!fs.existsSync('backend/.env')) fs.copyFileSync('backend/.env.example', 'backend/.env')\"",
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend run dev"
+  },
+  "dependencies": {
+    "dictionary-es": "^4.0.0",
+    "nspell": "^2.1.5"
+  }
+}

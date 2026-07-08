@@ -30,7 +30,7 @@ if (loginForm) {
 
       saveToken(data.token);
       saveUser(data.user);
-      window.location.href = "dashboard.html";
+      window.location.href = "onboarding.html";
     } catch (error) {
       showMessage(error.message, "error");
     }

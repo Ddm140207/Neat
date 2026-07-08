@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nota compartida | Neat!</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/yjs@13.6.18/dist/y.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/y-webrtc@10.4.0/dist/y-webrtc.min.js"></script>
+<style>
+body{background:radial-gradient(circle at top left,#f7f9fb,#e9edef);min-height:100vh;font-family:Inter,system-ui,sans-serif}
+.glass-card{background:rgba(255,255,255,0.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2)}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+</style>
+</head>
+<body class="p-6">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<img src="/public/logo.png" alt="Neat!" class="w-10 h-10 rounded-xl shadow-md"/>
+<h1 class="text-headline-md font-bold text-slate-800">Nota compartida</h1>
+</div>
+<div class="flex items-center gap-2 text-sm text-slate-400">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span id="collabStatus">Conectando...</span>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-6 mb-4">
+<input id="collabTitle" class="w-full text-2xl font-bold bg-transparent border-none focus:outline-none text-slate-800 mb-4" type="text" placeholder="Título de la nota" readonly/>
+<div id="collabEditor" class="min-h-[300px] text-[15px] leading-relaxed text-slate-700 focus:outline-none" contenteditable="false"></div>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-xs text-slate-400" id="onlineCount"></p>
+</div>
+</div>
+<script>
+const params=new URLSearchParams(location.search);
+const noteId=params.get("id");
+const token=params.get("token");
+
+if(!noteId||!token){
+  document.getElementById("collabEditor").innerHTML="<p style='color:#ef4444'>Enlace inválido o expirado</p>";
+} else {
+  const status=document.getElementById("collabStatus");
+  const ydoc=new Y.Doc();
+  const ytext=ydoc.getText("content");
+  const ytitle=ydoc.getText("title");
+
+  try{
+    const provider=new Y.WebRTC(ydoc,{room:`note-${noteId}`,signaling:["wss://y-webrtc-signaling.onrender.com"],maxBackoffTime:5000});
+    let isRemote=false;
+
+    provider.on("synced",()=>{status.textContent="Conectado";status.parentElement.className="flex items-center gap-2 text-sm text-emerald-600"});
+
+    const titleInput=document.getElementById("collabTitle");
+    const editorDiv=document.getElementById("collabEditor");
+
+    ytitle.observe(()=>{if(!isRemote&&ytitle.toString()){isRemote=true;titleInput.value=ytitle.toString();isRemote=false}});
+    ytext.observe(()=>{if(!isRemote&&ytext.toString()){isRemote=true;editorDiv.innerHTML=ytext.toString();isRemote=false}});
+
+    provider.on("peers",({added})=>{
+      document.getElementById("onlineCount").textContent=added?.length?`${added.length+1} persona(s) en línea`:"Solo tú";
+    });
+  }catch(e){
+    status.textContent="Error de conexión";
+    status.parentElement.className="flex items-center gap-2 text-sm text-red-500";
+  }
+}
+</script>
+</body>
+</html>

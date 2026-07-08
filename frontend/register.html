@@ -1,31 +1,95 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="light" lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro | Noty</title>
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Crear Cuenta | Neat!</title>
+<meta content="Regístrate en Neat! - Gestor de notas minimalista" name="description"/>
+<meta content="Neat!" property="og:title"/>
+<meta content="Crea tu cuenta gratuita y organiza tus notas con diseño glassmórfico." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="/public/banner.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="#005ab6" name="theme-color"/>
+<link href="/public/logo.svg" rel="shortcut icon" type="image/svg+xml"/>
+<link href="/public/logo.svg" rel="icon" type="image/svg+xml"/>
+<link href="/public/logo.png" rel="apple-touch-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#005ab6","on-primary":"#ffffff","primary-container":"#0072e4","secondary":"#6700bf","tertiary":"#b40065","surface":"#f7f9fb","surface-dim":"#d8dadc","on-surface":"#191c1e","on-surface-variant":"#414754","outline":"#717786","outline-variant":"#c1c6d7","text-main":"#1E293B","text-muted":"#64748B","glass-surface":"rgba(255,255,255,0.15)","glass-border":"rgba(255,255,255,0.25)","primary-fixed":"#d7e3ff","secondary-fixed":"#eedbff","tertiary-fixed":"#ffd9e3"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem","2xl":"1rem","3xl":"1.5rem"},fontFamily:{sans:["Inter","system-ui","sans-serif"],mono:["JetBrains Mono","monospace"]},fontSize:{"headline-lg":["36px",{lineHeight:"1.2",letterSpacing:"-0.01em",fontWeight:"700"}],"headline-md":["24px",{lineHeight:"1.3",fontWeight:"600"}],"body-md":["16px",{lineHeight:"1.6"}],"label-caps":["12px",{lineHeight:"1.2",letterSpacing:"0.05em",fontWeight:"600"}]}}}}
+</script>
+<style>
+.glass-panel{background:rgba(255,255,255,0.4);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.3);box-shadow:0 8px 32px 0 rgba(0,92,187,0.05)}
+.shimmer-button{position:relative;overflow:hidden}
+.shimmer-button::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(to bottom right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.13) 77%,rgba(255,255,255,0.5) 92%,rgba(255,255,255,0) 100%);transform:rotate(-45deg);transition:all 0.5s;opacity:0}
+.shimmer-button:hover::after{opacity:1;left:100%;top:100%}
+.input-glow:focus{box-shadow:0 0 0 2px rgba(0,90,182,0.1);border-color:#005ab6}
+.floating-blob{position:absolute;filter:blur(80px);z-index:-1;opacity:0.4;border-radius:50%;animation:drift 20s infinite alternate ease-in-out}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(100px,50px) scale(1.2)}}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+</style>
 </head>
-<body class="auth-page">
-  <main class="auth-card">
-    <a class="brand-link" href="index.html">Noty</a>
-    <h1>Crear cuenta</h1>
-    <form id="registerForm" class="form">
-      <label for="name">Nombre</label>
-      <input id="name" name="name" type="text" autocomplete="name" required>
-
-      <label for="email">Correo electronico</label>
-      <input id="email" name="email" type="email" autocomplete="email" required>
-
-      <label for="password">Contrasena</label>
-      <input id="password" name="password" type="password" autocomplete="new-password" required>
-
-      <button class="button primary" type="submit">Registrarme</button>
-      <p id="message" class="message" role="status"></p>
-    </form>
-    <p class="auth-switch">Ya tienes cuenta? <a href="login.html">Inicia sesion</a></p>
-  </main>
-  <script src="js/api.js?v=4"></script>
-  <script src="js/auth.js?v=4"></script>
+<body class="min-h-screen flex flex-col font-sans text-on-surface selection:bg-primary-fixed">
+<div class="fixed inset-0 overflow-hidden -z-10">
+<div class="floating-blob bg-primary w-[500px] h-[500px] -top-48 -left-24"></div>
+<div class="floating-blob bg-secondary w-[400px] h-[400px] top-1/2 -right-24" style="animation-delay:-5s"></div>
+<div class="floating-blob bg-tertiary w-[300px] h-[300px] -bottom-24 left-1/4" style="animation-delay:-10s"></div>
+</div>
+<main class="flex-grow flex items-center justify-center p-6">
+<div class="w-full max-w-md">
+<div class="flex flex-col items-center mb-8">
+<a href="index.html"><img src="/public/logo.png" alt="Neat!" class="w-20 h-20 mb-4 rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"/></a>
+<h1 class="text-headline-lg text-primary tracking-tight font-bold">Neat!</h1>
+<p class="text-body-md text-text-muted mt-2">Crea tu cuenta gratuita</p>
+</div>
+<div class="glass-panel p-8 md:p-10 rounded-xl">
+<form id="registerForm" class="space-y-6">
+<div class="space-y-4">
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Nombre Completo</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">person</span>
+<input name="name" class="w-full pl-12 pr-4 py-3 bg-white/20 border border-glass-border rounded-lg focus:outline-none input-glow transition-all placeholder:text-outline/60 text-on-surface" placeholder="Tu nombre" type="text" required/>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Correo Electrónico</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input name="email" class="w-full pl-12 pr-4 py-3 bg-white/20 border border-glass-border rounded-lg focus:outline-none input-glow transition-all placeholder:text-outline/60 text-on-surface" placeholder="correo@ejemplo.com" type="email" required/>
+</div>
+</div>
+<div>
+<label class="block text-label-caps text-on-surface-variant mb-2 font-semibold">Contraseña</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input name="password" class="w-full pl-12 pr-4 py-3 bg-white/20 border border-glass-border rounded-lg focus:outline-none input-glow transition-all placeholder:text-outline/60 text-on-surface" placeholder="••••••••" type="password" required/>
+</div>
+</div>
+</div>
+<button class="shimmer-button w-full bg-primary text-on-primary text-headline-md font-semibold py-4 rounded-lg shadow-sm hover:-translate-y-0.5 active:scale-95 transition-all duration-300" type="submit">Crear Cuenta</button>
+<p id="message" class="text-center text-body-md mt-4" role="status"></p>
+</form>
+<p class="mt-8 text-center text-body-md text-on-surface-variant">
+¿Ya tienes cuenta? <a href="login.html" class="text-primary font-semibold hover:underline decoration-2 underline-offset-4">Inicia sesión</a>
+</p>
+</div>
+<p class="mt-8 text-center text-xs text-outline px-8 leading-relaxed opacity-60 font-mono">
+Al registrarte, aceptas los <a href="#" class="hover:text-primary transition-colors">Términos de Servicio</a> y la <a href="#" class="hover:text-primary transition-colors">Política de Privacidad</a>.
+</p>
+</div>
+</main>
+<footer class="p-8 flex flex-col items-center gap-4 text-outline-variant">
+<div class="flex gap-6 text-label-caps font-semibold">
+<a href="index.html" class="text-on-surface hover:text-primary transition-colors">Inicio</a>
+<a href="login.html" class="text-on-surface hover:text-primary transition-colors">Iniciar sesión</a>
+</div>
+<div class="text-xs text-on-surface font-mono">© 2024 Neat! Task Management. Designed for focus.</div>
+</footer>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>

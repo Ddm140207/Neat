@@ -1,3 +1,5 @@
+![Neat! Banner](frontend/public/banner.jpg)
+
 # Noty
 
 Noty es una aplicacion web educativa para gestionar notas. El proyecto muestra, de forma simple y didactica, como construir una app full-stack con frontend vanilla, backend con Node.js/Express, API REST, SQLite y autenticacion con JWT.
@@ -76,20 +78,13 @@ git clone https://github.com/alitoxSB/Noty.git
 cd Noty
 ```
 
-Instala las dependencias del backend:
+Instala las dependencias (backend automaticamente):
 
 ```bash
-cd backend
 npm install
 ```
 
-Crea el archivo de variables de entorno:
-
-```bash
-cp .env.example .env
-```
-
-Puedes editar `.env` si quieres cambiar el puerto o la clave JWT:
+Esto tambien crea automaticamente el archivo `.env` con los valores por defecto. Puedes editarlo si quieres cambiar el puerto o la clave JWT:
 
 ```env
 PORT=3000
@@ -97,8 +92,6 @@ JWT_SECRET=educational_secret_key_change_this
 ```
 
 ## Ejecucion
-
-Desde la carpeta `backend`:
 
 ```bash
 npm start

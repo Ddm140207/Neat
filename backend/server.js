@@ -13,6 +13,7 @@ require("./database/database");
 
 const authRoutes = require("./routes/auth.routes");
 const notesRoutes = require("./routes/notes.routes");
+const spellRoutes = require("./routes/spell.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,7 +26,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../frontend")));
+const frontendPath = path.join(__dirname, "../frontend");
+app.use(express.static(frontendPath));
+
+app.get(["/favicon.ico", "/favicon.png"], (req, res) => {
+  res.sendFile(path.join(frontendPath, "public", "logo.svg"));
+});
 
 // ==========================================
 // API ROUTES SECTION
@@ -42,6 +48,7 @@ app.get("/api", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
+app.use("/api/spell", spellRoutes);
 
 // ==========================================
 // SERVER START SECTION
@@ -49,6 +56,22 @@ app.use("/api/notes", notesRoutes);
 // port so the frontend can call the API.
 // ==========================================
 
-app.listen(PORT, () => {
-  console.log(`Noty backend running at http://localhost:${PORT}`);
-});
+function startServer(port) {
+  const server = app.listen(port);
+
+  server.on("listening", () => {
+    console.log(`Noty backend running at http://localhost:${port}`);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.warn(`Port ${port} is busy, trying ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error("Server error:", err.message);
+      process.exit(1);
+    }
+  });
+}
+
+startServer(PORT);
