@@ -1,45 +1,49 @@
 ![Neat! Banner](frontend/public/banner.jpg)
 
-# Noty
+# Neat! — Stay organized
 
-Noty es una aplicacion web educativa para gestionar notas. El proyecto muestra, de forma simple y didactica, como construir una app full-stack con frontend vanilla, backend con Node.js/Express, API REST, SQLite y autenticacion con JWT.
+Neat! es una aplicación web open source moderna para gestión de notas con diseño moderno, editor enriquecido, colaboración en tiempo real y experiencia tipo Google Docs.
 
-## Caracteristicas
+## Características
 
-- Registro de usuarios.
-- Inicio de sesion con JWT.
-- Hash de contrasenas con bcrypt.
-- CRUD completo de notas.
-- Proteccion de rutas privadas.
-- Validacion de propiedad: cada usuario solo accede a sus propias notas.
-- Editor de notas con formato basico.
-- Exportacion de notas a PDF mediante impresion del navegador.
-- Frontend y backend servidos desde Express en un solo puerto.
-- Codigo separado por responsabilidades y comentado por secciones.
+- Registro e inicio de sesión con JWT + bcrypt
+- CRUD completo de notas con editor enriquecido (negrita, cursiva, listas, colores, encabezados)
+- Onboarding de perfil: nombre, foto de avatar, tipo de usuario
+- Panel de notas con menú contextual (renombrar, compartir, eliminar)
+- Vista calendario con notas por día y entrada inline
+- Proyectos para organizar notas
+- Exportación a PDF con html2pdf (descarga directa)
+- Corrector ortográfico integrado (nspell + diccionario español)
+- Colaboración en tiempo real con Yjs + WebRTC
+- Página de nota completa estilo Google Docs con barra de herramientas
+- Notificaciones locales con panel de alertas
+- Modal de configuración de perfil
+- Barra de búsqueda de notas
+- Diseño responsive con glassmorphism
+- Gradientes animados que siguen el mouse
+- Auto-scroll suave y transiciones
 
-## Tecnologias
+## Tecnologías
 
-- HTML5
-- CSS3
-- JavaScript Vanilla
-- Fetch API
-- Node.js
-- Express.js
-- SQLite
-- sqlite3
-- bcrypt
-- JSON Web Token (JWT)
-- CORS
-- dotenv
-- nodemon
-- localStorage
-- contenteditable
-- document.execCommand
+### Frontend
+- HTML5 + Tailwind CSS (CDN)
+- JavaScript Vanilla (ES modules)
+- Google Material Symbols
+- contenteditable + document.execCommand
+- html2pdf.js — generación de PDF
+- Yjs + y-webrtc — colaboración P2P en tiempo real
+
+### Backend
+- Node.js + Express.js
+- SQLite (better-sqlite3)
+- bcrypt — hash de contraseñas
+- JSON Web Token (JWT) — autenticación
+- CORS + dotenv + nodemon
 
 ## Estructura
 
 ```text
-Noty/
+Neat!/
 ├── backend/
 │   ├── controllers/
 │   │   ├── auth.controller.js
@@ -55,79 +59,69 @@ Noty/
 │   ├── package.json
 │   └── server.js
 ├── frontend/
-│   ├── css/
-│   │   └── styles.css
 │   ├── js/
 │   │   ├── api.js
 │   │   ├── auth.js
 │   │   └── notes.js
-│   ├── dashboard.html
 │   ├── index.html
 │   ├── login.html
-│   └── register.html
+│   ├── register.html
+│   ├── onboarding.html
+│   ├── dashboard.html
+│   └── collab.html
 ├── .gitignore
+├── package.json
 └── README.md
 ```
 
-## Instalacion
-
-Clona el repositorio:
+## Instalación
 
 ```bash
-git clone https://github.com/alitoxSB/Noty.git
-cd Noty
-```
-
-Instala las dependencias (backend automaticamente):
-
-```bash
+git clone <repo>
+cd Neat
 npm install
 ```
 
-Esto tambien crea automaticamente el archivo `.env` con los valores por defecto. Puedes editarlo si quieres cambiar el puerto o la clave JWT:
+Esto instala las dependencias del backend y crea automáticamente el archivo `.env`.
 
 ```env
 PORT=3000
 JWT_SECRET=educational_secret_key_change_this
 ```
 
-## Ejecucion
+## Ejecución
 
 ```bash
-npm start
+npm start        # producción
+npm run dev      # desarrollo con nodemon + recarga automática
 ```
 
-Para desarrollo con reinicio automatico:
-
-```bash
-npm run dev
-```
-
-Abre la app en:
+Abrir en:
 
 ```text
 http://localhost:3000
 ```
 
-Paginas principales:
+### Páginas
 
 ```text
-http://localhost:3000/register.html
-http://localhost:3000/login.html
-http://localhost:3000/dashboard.html
+/                  → Landing page
+/register.html     → Crear cuenta
+/login.html        → Iniciar sesión
+/onboarding.html   → Configurar perfil (post-registro)
+/dashboard.html    → Panel principal de notas
+/collab.html       → Vista compartida (colaboración)
 ```
 
 ## API REST
 
-Rutas publicas:
-
+### Públicas
 ```text
 POST /api/auth/register
 POST /api/auth/login
 ```
 
-Rutas protegidas con JWT:
-
+### Protegidas (JWT)
 ```text
 GET    /api/notes
 GET    /api/notes/:id
@@ -136,45 +130,30 @@ PUT    /api/notes/:id
 DELETE /api/notes/:id
 ```
 
-Las rutas protegidas reciben el token asi:
+Autenticación:
 
 ```text
-Authorization: Bearer TOKEN_AQUI
+Authorization: Bearer <token>
 ```
 
 ## Base de datos
 
-Noty usa SQLite. Al iniciar el servidor, `backend/database/database.js` crea automaticamente la base de datos local y las tablas necesarias:
+SQLite local (`backend/database/noty.sqlite`). Al iniciar se crean automáticamente las tablas `users` y `notes`.
 
-- `users`
-- `notes`
+## Colaboración en tiempo real
 
-La base local `backend/database/noty.sqlite` no se sube al repositorio porque es un archivo generado en ejecucion.
+Cuando abres una nota desde el dashboard, el editor se conecta a una sala WebRTC (`note-{id}`) usando Yjs. Todos los usuarios con la misma nota abierta ven los cambios en vivo. No requiere servidor WebSocket propio — usa señalización pública.
+
+Para compartir una nota, usa el menú de 3 puntos → "Compartir" y envía el enlace.
 
 ## Flujo de uso
 
-1. El usuario crea una cuenta en `register.html`.
-2. Inicia sesion en `login.html`.
-3. El backend valida credenciales y devuelve un JWT.
-4. El frontend guarda el token en `localStorage`.
-5. El usuario entra al dashboard.
-6. Puede crear, editar, eliminar y exportar notas.
-7. Al cerrar sesion, el token se elimina del navegador.
+1. Registro en `/register.html`
+2. Inicio de sesión → redirige a `/onboarding.html`
+3. Configurar nombre, foto de perfil y tipo de usuario
+4. Dashboard: crear, editar, buscar, organizar notas
+5. Menú contextual en cada nota: renombrar, compartir, eliminar
+6. Click en "Pantalla completa" en el editor → abre vista Google Docs
+7. Vista calendario para notas con fecha
+8. Proyectos para agrupar notas relacionadas
 
-## Enfoque educativo
-
-Este proyecto evita frameworks de frontend para que sea mas facil estudiar:
-
-- estructura HTML;
-- estilos CSS;
-- DOM y eventos con JavaScript;
-- consumo de API con `fetch`;
-- rutas REST;
-- middleware;
-- controladores;
-- persistencia con SQLite;
-- autenticacion con JWT.
-
-## Nota de seguridad
-
-Noty esta pensado para aprendizaje. Para produccion se recomienda agregar validaciones mas estrictas, sanitizacion HTML avanzada, cookies httpOnly, HTTPS obligatorio, gestion robusta de errores y una estrategia formal de migraciones de base de datos.
