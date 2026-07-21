@@ -53,7 +53,7 @@ if(!noteId||!token){
   const ytitle=ydoc.getText("title");
 
   try{
-    const provider=new Y.WebRTC(ydoc,{room:`note-${noteId}`,signaling:["wss://y-webrtc-signaling.onrender.com"],maxBackoffTime:5000});
+    const provider=new Y.WebRTC(ydoc,{room:`note-${noteId}`,signaling:["wss://signaling.yjs.dev"],maxBackoffTime:5000});
     let isRemote=false;
 
     provider.on("synced",()=>{status.textContent="Conectado";status.parentElement.className="flex items-center gap-2 text-sm text-emerald-600"});
