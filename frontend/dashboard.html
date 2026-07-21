@@ -365,6 +365,11 @@ body{background:radial-gradient(circle at top left,#f7f9fb,#e9edef);min-height:1
 </div>
 </div>
 </div>
+
+<button id="spellCheckBtn" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Corrector ortográfico">
+<span class="material-symbols-outlined text-[20px]">spellcheck</span>
+</button>
+<div class="toolbar-divider"></div>
 <button data-cmd="outdent" class="toolbar-btn w-9 h-9 flex items-center justify-center rounded-[10px] text-slate-600 hover:bg-[rgba(15,23,42,0.05)] hover:text-slate-900 active:scale-[0.96] transition-all duration-[120ms]" title="Disminuir sangría">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="13" y1="5" x2="21" y2="5"/><line x1="13" y1="10" x2="21" y2="10"/><line x1="13" y1="15" x2="21" y2="15"/><line x1="13" y1="20" x2="21" y2="20"/><polyline points="9,16 5,12 9,8"/></svg>
 </button>
@@ -440,38 +445,121 @@ function closeEditor(){
   destroyCollab()
 }
 
+let ytitle=null;
+let autoSaveTimeout = null;
+
+function autoSave() {
+  clearTimeout(autoSaveTimeout);
+  autoSaveTimeout = setTimeout(() => {
+    if (selectedNoteId) {
+      window.NotyNotes.saveNote();
+    }
+  }, 2000);
+}
+
 function initCollab(noteId){
   destroyCollab();
   if(!noteId||!getToken())return;
   try{
     ydoc=new Y.Doc();
     ytext=ydoc.getText("content");
+    ytitle=ydoc.getText("title");
     const provider=new Y.WebRTC(ydoc,{room:`note-${noteId}`,signaling:["wss://y-webrtc-signaling.onrender.com"],maxBackoffTime:5000});
     ywebsocket=provider;
+
+
     ytext.observe((event)=>{
       if(isRemoteUpdate)return;
       const remoteHtml=ytext.toString();
       if(remoteHtml&&remoteHtml!==noteEditor.innerHTML){
         isRemoteUpdate=true;
+
+        // Save cursor position
+        const selection = window.getSelection();
+        let savedRange = null;
+        if (selection.rangeCount > 0 && noteEditor.contains(selection.anchorNode)) {
+           // Simple fallback: we can't perfectly restore across HTML replacement, but we try not to lose focus
+           savedRange = selection.getRangeAt(0);
+        }
+
         noteEditor.innerHTML=remoteHtml;
+
+        // Very basic focus restore
+        if (savedRange) {
+           noteEditor.focus();
+           // Attempting to restore the exact range is complex because nodes are recreated.
+           // We just keep focus on the editor.
+        }
+
         isRemoteUpdate=false;
+        autoSave();
       }
     });
+
+
+    ytitle.observe((event)=>{
+      if(isRemoteUpdate)return;
+      const remoteTitle=ytitle.toString();
+      if(remoteTitle&&remoteTitle!==noteTitle.value){
+        isRemoteUpdate=true;
+        noteTitle.value=remoteTitle;
+        isRemoteUpdate=false;
+        autoSave();
+      }
+    });
+
     noteEditor.addEventListener("input",onEditorInput);
+    noteTitle.addEventListener("input",onTitleInput);
   }catch(e){console.warn("Collab init error:",e)}
 }
+
+
+function computeDiffAndUpdate(oldText, newText, yTextObj) {
+  let start = 0;
+  while (start < oldText.length && start < newText.length && oldText[start] === newText[start]) {
+    start++;
+  }
+  let endOld = oldText.length - 1;
+  let endNew = newText.length - 1;
+  while (endOld >= start && endNew >= start && oldText[endOld] === newText[endNew]) {
+    endOld--;
+    endNew--;
+  }
+
+  const deleteCount = endOld - start + 1;
+  const insertText = newText.substring(start, endNew + 1);
+
+  if (deleteCount > 0 || insertText.length > 0) {
+    yTextObj.delete(start, deleteCount);
+    if (insertText.length > 0) {
+      yTextObj.insert(start, insertText);
+    }
+  }
+}
+
 function onEditorInput(){
   if(isRemoteUpdate||!ytext)return;
   isRemoteUpdate=true;
-  ytext.delete(0,ytext.length);
-  ytext.insert(0,noteEditor.innerHTML);
+  computeDiffAndUpdate(ytext.toString(), noteEditor.innerHTML, ytext);
   isRemoteUpdate=false;
+  autoSave();
 }
+
+function onTitleInput(){
+  if(isRemoteUpdate||!ytitle)return;
+  isRemoteUpdate=true;
+  computeDiffAndUpdate(ytitle.toString(), noteTitle.value, ytitle);
+  isRemoteUpdate=false;
+  autoSave();
+}
+
 function destroyCollab(){
   if(ywebsocket){try{ywebsocket.destroy()}catch(e){}}
   if(ydoc){ydoc.destroy()}
-  ydoc=null;ytext=null;ywebsocket=null;
+  ydoc=null;ytext=null;ytitle=null;ywebsocket=null;
   noteEditor.removeEventListener("input",onEditorInput);
+  noteTitle.removeEventListener("input",onTitleInput);
+  clearTimeout(autoSaveTimeout);
 }
 
 function renderNotes(){const query=searchQuery.toLowerCase().trim();let filtered=notes;if(query)filtered=notes.filter(n=>n.title.toLowerCase().includes(query)||truncateText(n.content).toLowerCase().includes(query));notesGrid.innerHTML="";if(filtered.length===0){notesGrid.innerHTML=`<div class="col-span-full flex flex-col items-center justify-center py-16 text-on-surface-variant/50"><span class="material-symbols-outlined text-6xl mb-4">${query?"search_off":"note_add"}</span><p class="text-lg font-semibold">${query?"Sin resultados para \""+query+"\"":"Aún no has escrito ninguna nota..."}</p><p class="text-sm mt-1">${query?"Intenta con otros términos":"Crea tu primera nota con el botón de arriba"}</p></div>`;notesCount.textContent="0 notas";return}
@@ -593,6 +681,74 @@ function updateColorIndicator(color){const line=colorBtn.querySelector("line");i
 document.querySelector(".color-add-btn")?.addEventListener("click",function(e){e.stopPropagation();const input=document.createElement("input");input.type="color";input.value="#1e293b";input.addEventListener("input",function(){document.execCommand("foreColor",false,this.value);noteEditor.focus()});input.addEventListener("change",function(){document.execCommand("foreColor",false,this.value);noteEditor.focus();closeColorPicker();updateColorIndicator(this.value)});input.click()});
 // Eyedropper
 document.querySelector(".color-eyedropper-btn")?.addEventListener("click",async function(e){e.stopPropagation();try{if(!window.EyeDropper){showMessage("Tu navegador no soporta el cuentagotas","error");return}const dropper=new EyeDropper();const result=await dropper.open();document.execCommand("foreColor",false,result.sRGBHex);noteEditor.focus();closeColorPicker();updateColorIndicator(result.sRGBHex)}catch(err){}});
+
+
+
+// Spell checker
+const spellCheckBtn = document.getElementById("spellCheckBtn");
+if (spellCheckBtn) {
+  spellCheckBtn.addEventListener("click", async () => {
+    try {
+      showMessage("Revisando ortografía...", "info");
+
+      const text = noteEditor.innerText || noteEditor.textContent || '';
+
+      const data = await apiRequest("/spell/check", {
+        method: "POST",
+        body: JSON.stringify({ text })
+      });
+
+      if (!data.errors || data.errors.length === 0) {
+        showMessage("No se encontraron errores", "success");
+        return;
+      }
+
+      // Clean previous markers
+      const previousMarkers = noteEditor.querySelectorAll('.spell-error');
+      previousMarkers.forEach(m => {
+        const textNode = document.createTextNode(m.textContent);
+        m.parentNode.replaceChild(textNode, m);
+      });
+
+      // Safe replacement using TreeWalker
+      const walker = document.createTreeWalker(noteEditor, NodeFilter.SHOW_TEXT, null, false);
+      const textNodes = [];
+      while(walker.nextNode()) textNodes.push(walker.currentNode);
+
+      textNodes.forEach(node => {
+        let textContent = node.nodeValue;
+        let modified = false;
+
+        data.errors.forEach(err => {
+          const regex = new RegExp('\\b' + err + '\\b', 'gi');
+          if (regex.test(textContent)) {
+             modified = true;
+          }
+        });
+
+        if (modified) {
+          const span = document.createElement('span');
+          let html = textContent;
+          data.errors.forEach(err => {
+             const regex = new RegExp('\\b' + err + '\\b', 'gi');
+             html = html.replace(regex, `<span class="spell-error" title="Sugerencias: ${data.suggestions[err]?.join(', ') || 'ninguna'}">${err}</span>`);
+          });
+          span.innerHTML = html;
+          node.parentNode.replaceChild(span, node);
+        }
+      });
+
+      showMessage(`Se encontraron ${data.errors.length} errores`, "error");
+    } catch (e) {
+      showMessage(e.message, "error");
+    }
+  });
+}
+
+// Remove spell errors when typing
+noteEditor.addEventListener("input", (e) => {
+  // handled natively mostly, or they get wiped on next check
+});
 
 // View switching
 const views=["inboxView","notesView","proximosView","proyectosView"];

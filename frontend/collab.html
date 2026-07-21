@@ -21,14 +21,19 @@ body{background:radial-gradient(circle at top left,#f7f9fb,#e9edef);min-height:1
 <img src="/public/logo.png" alt="Neat!" class="w-10 h-10 rounded-xl shadow-md"/>
 <h1 class="text-headline-md font-bold text-slate-800">Nota compartida</h1>
 </div>
-<div class="flex items-center gap-2 text-sm text-slate-400">
-<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-<span id="collabStatus">Conectando...</span>
+
+<div class="flex items-center gap-2">
+  <button id="saveBtn" class="px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold shadow hover:bg-emerald-600 transition-colors">Guardar</button>
+  <div class="flex items-center gap-2 text-sm text-slate-400">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="collabStatus">Conectando...</span>
+  </div>
 </div>
+
 </div>
 <div class="glass-card rounded-2xl p-6 mb-4">
-<input id="collabTitle" class="w-full text-2xl font-bold bg-transparent border-none focus:outline-none text-slate-800 mb-4" type="text" placeholder="Título de la nota" readonly/>
-<div id="collabEditor" class="min-h-[300px] text-[15px] leading-relaxed text-slate-700 focus:outline-none" contenteditable="false"></div>
+<input id="collabTitle" class="w-full text-2xl font-bold bg-transparent border-none focus:outline-none text-slate-800 mb-4" type="text" placeholder="Título de la nota" />
+<div id="collabEditor" class="min-h-[300px] text-[15px] leading-relaxed text-slate-700 focus:outline-none" contenteditable="true"></div>
 </div>
 <div class="flex items-center justify-between">
 <p class="text-xs text-slate-400" id="onlineCount"></p>
@@ -53,13 +58,84 @@ if(!noteId||!token){
 
     provider.on("synced",()=>{status.textContent="Conectado";status.parentElement.className="flex items-center gap-2 text-sm text-emerald-600"});
 
+
     const titleInput=document.getElementById("collabTitle");
     const editorDiv=document.getElementById("collabEditor");
 
     ytitle.observe(()=>{if(!isRemote&&ytitle.toString()){isRemote=true;titleInput.value=ytitle.toString();isRemote=false}});
     ytext.observe(()=>{if(!isRemote&&ytext.toString()){isRemote=true;editorDiv.innerHTML=ytext.toString();isRemote=false}});
 
+
+    function computeDiffAndUpdate(oldText, newText, yTextObj) {
+      let start = 0;
+      while (start < oldText.length && start < newText.length && oldText[start] === newText[start]) {
+        start++;
+      }
+      let endOld = oldText.length - 1;
+      let endNew = newText.length - 1;
+      while (endOld >= start && endNew >= start && oldText[endOld] === newText[endNew]) {
+        endOld--;
+        endNew--;
+      }
+
+      const deleteCount = endOld - start + 1;
+      const insertText = newText.substring(start, endNew + 1);
+
+      if (deleteCount > 0 || insertText.length > 0) {
+        yTextObj.delete(start, deleteCount);
+        if (insertText.length > 0) {
+          yTextObj.insert(start, insertText);
+        }
+      }
+    }
+
+    titleInput.addEventListener('input', () => {
+      if(isRemote) return;
+      isRemote=true;
+      computeDiffAndUpdate(ytitle.toString(), titleInput.value, ytitle);
+      isRemote=false;
+    });
+
+    editorDiv.addEventListener('input', () => {
+      if(isRemote) return;
+      isRemote=true;
+      computeDiffAndUpdate(ytext.toString(), editorDiv.innerHTML, ytext);
+      isRemote=false;
+    });
+
+
+
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("saveBtn");
+      const origText = btn.textContent;
+      btn.textContent = "Guardando...";
+      btn.disabled = true;
+      try {
+        const res = await fetch(`/api/notes/${noteId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: titleInput.value,
+            content: editorDiv.innerHTML
+          })
+        });
+        if(res.ok) {
+          btn.textContent = "Guardado";
+          setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
+        } else {
+          throw new Error("Failed to save");
+        }
+      } catch(e) {
+        btn.textContent = "Error";
+        setTimeout(() => { btn.textContent = origText; btn.disabled = false; }, 2000);
+      }
+    });
+
     provider.on("peers",({added})=>{
+
       document.getElementById("onlineCount").textContent=added?.length?`${added.length+1} persona(s) en línea`:"Solo tú";
     });
   }catch(e){
